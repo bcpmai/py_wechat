@@ -12,4 +12,5 @@ if socket.gethostname() == 'bcpmai-win10':
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://baernaoer:baernaoer@127.0.0.1/yijiemp?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
 db_session = SQLAlchemy(app).session
