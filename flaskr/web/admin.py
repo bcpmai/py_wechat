@@ -294,6 +294,7 @@ def submit_types():
 
         return jsonify({'success': True, 'msg': 'save ok'})
 
+
 @admin_bp.route('/admin/types/delete', methods=["POST"])
 def delete_types():
     """
@@ -338,3 +339,9 @@ def check_login():
     """
     if session.get('username') != 'admin_login':
         return redirect('/admin/login')
+
+
+
+
+    # data_sj = time.localtime(time_sj)
+    # time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)
