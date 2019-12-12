@@ -5,7 +5,6 @@ import os
 from flask import Flask
 from .web.api import api_bp
 from .web.admin import admin_bp
-# sql_uri = 'mysql+pymysql://root:dev2312@127.0.0.1/api_wechat?charset=utf8mb4'
 
 
 def create_app(test_config=None):

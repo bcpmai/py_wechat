@@ -9,7 +9,6 @@ import requests
 import xml.sax.handler
 import hashlib
 
-
 from flask import Blueprint, jsonify, request
 from flaskr.common import db_session
 
@@ -104,8 +103,8 @@ def get_random(star, end):
     r = random.randint(star, end)
     res_random = r
     if r < 10:
-        res_random = '0'+'0'+str(r)
-    if r >=10 and r<100:
+        res_random = '0' + '0' + str(r)
+    if r >= 10 and r < 100:
         res_random = '0' + str(r)
 
     return str(res_random)
@@ -257,7 +256,7 @@ def get_orders():
 
 
 @api_bp.route('/get-membertypes')
-def get_membertypes():
+def get_member_types():
     """
     后台类型列表
     :return:
@@ -397,7 +396,7 @@ def get_open_id():
     try:
 
         url = "https://api.weixin.qq.com/sns/jscode2session?" \
-              "appid={app_id}&secret={app_secret}&js_code={code}&grant_type=authorization_code".\
+              "appid={app_id}&secret={app_secret}&js_code={code}&grant_type=authorization_code". \
             format(app_id=app_id, app_secret=app_secret, code=code)
         r = requests.get(url)
         wx_res_dict = json.loads(r.text)
@@ -438,11 +437,11 @@ def notice_weixin_payment():
         # 微信金额保存均已整型保存
         # 比较订单金额以及支付金额是否一致
         total_fee = json_data_dict.get('total_fee', 0)
-        total_fee = total_fee/100
+        total_fee = total_fee / 100
         total_fee = Decimal(total_fee).quantize(Decimal("0.00"))
 
         settlement_total_fee = json_data_dict.get('settlement_total_fee', 0)
-        settlement_total_fee = settlement_total_fee/100
+        settlement_total_fee = settlement_total_fee / 100
         settlement_total_fee = Decimal(settlement_total_fee).quantize(Decimal("0.00"))
 
         # 支付状态为0
@@ -485,7 +484,6 @@ def notice_weixin_payment():
 
 @api_bp.route('/weixin-pay', methods=["POST"])
 def weixin_pay():
-
     if request.method == 'POST':
         data = request.get_data()
         json_data_dict = json.loads(data.decode("utf-8"))
@@ -545,7 +543,3 @@ def weixin_pay():
 
     else:
         return jsonify({'return_code': 'FAIL'})
-
-
-
-
