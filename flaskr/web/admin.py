@@ -7,11 +7,13 @@ from flask import Flask, session, redirect, url_for
 from flask import Blueprint, jsonify, Flask, request, render_template
 
 from flaskr.common import db_session
+from flaskr.db_model.repair_order import RepairOrder
 from flaskr.web import login_required
 
 admin_bp = Blueprint('admin_bp', __name__)
 
 
+@admin_bp.route('/', methods=["POST", "GET"])
 @admin_bp.route('/admin/login', methods=["POST", "GET"])
 def admin_login():
     """
@@ -59,6 +61,7 @@ def admin_member_list():
 
     return render_template('member-list.html', records=records)
 
+
 @login_required
 @admin_bp.route('/admin/order/list')
 def admin_order_list():
@@ -66,17 +69,20 @@ def admin_order_list():
     后台订单列表
     :return:
     """
-    records = list()
+    # records = list()
+    #
+    # query_address_sql = "SELECT * FROM repair_order "
+    # res = db_session.execute(query_address_sql).fetchall()
+    #
+    # for temp in res:
+    #     records.append(dict(temp))
+    #
+    # db_session.close()
 
-    query_address_sql = "SELECT * FROM repair_order "
-    res = db_session.execute(query_address_sql).fetchall()
+    page = request.args.get('page', 1)
 
-    for temp in res:
-        records.append(dict(temp))
-
-    db_session.close()
-
-    return render_template('order-list.html', records=records)
+    pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 5)
+    return render_template('order-list.html', pagination=pagination, records=pagination.items)
 
 
 @login_required
@@ -89,7 +95,7 @@ def admin_member_type_list():
 
     records = list()
 
-    query_address_sql = "SELECT * FROM membertypes "
+    query_address_sql = "SELECT * FROM member_types "
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
@@ -128,7 +134,7 @@ def submit_member_types():
 
         try:
 
-            insert_address_sql = "insert into membertypes (member_title,member_price,member_limit," \
+            insert_address_sql = "insert into member_types (member_title,member_price,member_limit," \
                                  "member_describe,member_details,created_at,updated_at) " \
                                  "values ('{member_title}','{member_price}','{member_limit}','{member_describe}'," \
                                  "'{member_details}',{created_at},{updated_at})". \
@@ -158,7 +164,7 @@ def delete_member_type():
 
         try:
 
-            insert_address_sql = "delete from membertypes where id={id}".format(id=id)
+            insert_address_sql = "delete from member_types where id={id}".format(id=id)
 
             db_session.execute(insert_address_sql)
             db_session.commit()
@@ -341,7 +347,6 @@ def admin_logout():
 
     return redirect('/admin/login')
 
-
 # def check_login():
 #     """
 #     检查登录
@@ -350,5 +355,5 @@ def admin_logout():
 #     if session.get('username') != 'admin_login':
 #         return redirect('/admin/login')
 
-    # data_sj = time.localtime(time_sj)
-    # time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)
+# data_sj = time.localtime(time_sj)
+# time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)

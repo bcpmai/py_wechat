@@ -63,26 +63,26 @@
                             <th>操作</th>
                         </thead>
                         <tbody>
-                        {% for user in records %}
+                        {% for data in records %}
                             <tr>
                                 <td>
-                                    {{ user.id|title }}
+                                    {{ data.id|title }}
                                 </td>
                                 <td>
-                                    {{ user.name|title }}
+                                    {{ data.name|title }}
                                 </td>
-                                <td>{{ user.mobile|title }}</td>
-                                <td>{{ user.type|title }} - {{ user.category_name|title }}</td>
-                                <td>{{ user.price|title }}</td>
-                                <td>{{ user.address|title }}</td>
-                                <td>{{ user.created_at|title }}</td>
-                                {% if user.status == 0  %}
+                                <td>{{ data.mobile|title }}</td>
+                                <td>{{ data.type|title }} - {{ data.category_name|title }}</td>
+                                <td>{{ data.price|title }}</td>
+                                <td>{{ data.address|title }}</td>
+                                <td>{{ data.created_at|title }}</td>
+                                {% if data.status == 0  %}
                                     <td>进行中</td>
                                 {% else %}
                                     <td>已结束</td>
                                 {% endif %}
                                 <td class="td-manage">
-                                    <a title="删除" onclick="member_del(this,{{ user.id }})" href="javascript:;">
+                                    <a title="删除" onclick="member_del(this,{{ data.id }})" href="javascript:;">
                                         <i class="layui-icon">&#xe640;</i></a>
                                 </td>
                             </tr>
@@ -90,18 +90,22 @@
                         </tbody>
                     </table>
                 </div>
-                {#                        <div class="layui-card-body ">#}
-                {#                            <div class="page">#}
-                {#                                <div>#}
-                {#                                  <a class="prev" href="">&lt;&lt;</a>#}
-                {#                                  <a class="num" href="">1</a>#}
-                {#                                  <span class="current">2</span>#}
-                {#                                  <a class="num" href="">3</a>#}
-                {#                                  <a class="num" href="">489</a>#}
-                {#                                  <a class="next" href="">&gt;&gt;</a>#}
-                {#                                </div>#}
-                {#                            </div>#}
-                {#                        </div>#}
+                <div class="layui-card-body ">
+                    <div class="page">
+                      {%- for page in pagination.iter_pages() %}
+                        {% if page %}
+                          {% if page != pagination.page %}
+                            <a class="num" href="{{ url_for('admin_bp.admin_order_list', page=page) }}">{{ page }}</a>
+                          {% else %}
+                            <span class="current">{{ page }}</span>
+                          {% endif %}
+                        {% else %}
+                          <span class=ellipsis>…</span>
+                        {% endif %}
+                      {%- endfor %}
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

@@ -6,8 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import socket
 
-# 配置数据库 todo 迁移到 dotenv
-
 app = Flask(__name__)
 # if socket.gethostname() == 'bcpmai-win10':
 #     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:dev2312@127.0.0.1/api_wechat?charset=utf8mb4'
@@ -20,4 +18,5 @@ load_dotenv(dotenv_path=dotenv_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('mysql_link', '')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-db_session = SQLAlchemy(app).session
+Base = SQLAlchemy(app)
+db_session = Base.session
