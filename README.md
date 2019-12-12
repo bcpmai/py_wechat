@@ -100,4 +100,5 @@ http://www.a.com/admin/login 登录地址
 
 ### 开发环境 api地址
 
-### 配置项目需要在根目录定义.env 请参考.env.dist
+### 其他
+配置项目需要在根目录定义.env 请参考.env.dist
