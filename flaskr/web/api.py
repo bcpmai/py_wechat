@@ -388,14 +388,10 @@ def notice_weixin_payment():
 
 @api_bp.route('/weixin-pay', methods=["POST"])
 def weixin_pay():
-<<<<<<< HEAD
     """
     微信下单支付接口
     :return:
     """
-
-=======
->>>>>>> d1431f8004e76a666eb0d6b76ceccbdccabd16bc
     if request.method == 'POST':
         data = request.get_data()
         json_data_dict = json.loads(data.decode("utf-8"))
