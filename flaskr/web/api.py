@@ -9,7 +9,7 @@ import requests
 
 from flask import Blueprint, jsonify, request
 from flaskr.common import db_session
-from flaskr.common.utils import get_random, md5, dict_to_xml, client_post_xml_data_requests
+from flaskr.common.utils import get_random, md5, dict_to_xml, client_post_xml_data_requests, xml_to_dict
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -405,10 +405,11 @@ def weixin_pay():
         data['mch_id'] = json_data_dict['mch_id']
 
         # open_id
-        data['open_id'] = json_data_dict['open_id']
+        data['openid'] = json_data_dict['open_id']
 
         # API 秘钥KEY
         api_key = json_data_dict['api_key']
+        # api_key = 'J4sQ3YdrgAyrUznO13KKDE7e5D3j1cJz'
 
         str_random = str(int(time.time()) + random.randint(1, 1000))
         nonce_str = md5(str_random)
@@ -420,12 +421,14 @@ def weixin_pay():
 
         # 下单金额 前端获取 微信规则必须是整数
         data['total_fee'] = int(json_data_dict['total_fee']*100)
+        # data['total_fee'] = 7500
         # 终端IP，由前端获取
         data['spbill_create_ip'] = json_data_dict['ip']
         # 线上通知回调地址
         data['notify_url'] = 'http://yije.xiusha.net/notice-weixin-payment'
         # 交易类型
-        data['trade_type'] = 'JSAPI'
+        # data['trade_type'] = 'JSAPI'
+        data['trade_type'] = 'NATIVE'
 
         # 订单号由订单生成时产生 todo
         data['out_trade_no'] = json_data_dict['out_trade_no']
@@ -440,19 +443,24 @@ def weixin_pay():
             key_value_str = "{k}={v}".format(k=k, v=data[k])
             key_value_str_list.append(key_value_str)
 
-        sign = md5("&".join(key_value_str_list) + '&key={key}'.format(key=api_key)).upper()
+        string_sign_temp = "&".join(key_value_str_list) + '&key={key}'.format(key=api_key)
+
+        sign = md5(string_sign_temp).upper()
 
         data['sign'] = sign
 
         xml_data = dict_to_xml(data)
 
         rep = client_post_xml_data_requests(url, xml_data)
+        # print(data)
+        xml_res_str = rep.text.encode('raw_unicode_escape').decode()
 
-        print(data)
-        ss = rep.text.encode('raw_unicode_escape')
-        print(ss.decode())
+        res = xml_to_dict(xml_res_str)
 
-        return jsonify({'return_code': 'SUCCESS'})
+        if res.get('return_code','') == 'SUCCESS':
+            return jsonify({'return_code': 'SUCCESS', 'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
+        else:
+            return jsonify({'return_code': 'FAIL'})
 
     else:
         return jsonify({'return_code': 'FAIL'})
