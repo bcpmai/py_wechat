@@ -264,14 +264,14 @@ def get_repair_order():
     return jsonify({'success': True, 'list': records})
 
 
-@api_bp.route('/get-member-wxname')
+@api_bp.route('/get-member-wxname', methods=["GET"])
 def get_member_wxname():
     """
     我要报修
     :return:
     """
     records = list()
-    wx_name = request.form['wx_name']
+    wx_name = request.args.get('wx_name')
     insert_address_sql = "SELECT * FROM member where wx_name='{wx_name}'".format(wx_name=wx_name)
     res = db_session.execute(insert_address_sql).fetchall()
     for temp in res:
