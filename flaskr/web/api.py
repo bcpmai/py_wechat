@@ -158,7 +158,7 @@ def get_orders():
     return jsonify({'success': True, 'list': records})
 
 
-@api_bp.route('/get-membertypes')
+@api_bp.route('/get-member-types')
 def get_member_types():
     """
     后台类型列表
@@ -208,7 +208,7 @@ def get_types():
     return jsonify({'success': True, 'list': records})
 
 
-@api_bp.route('/get-typesCategory', methods=["POST"])
+@api_bp.route('/get-types-category', methods=["POST"])
 def get_types_category():
     """
     获取子类
