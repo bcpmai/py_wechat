@@ -448,6 +448,8 @@ def weixin_pay():
 
         rep = client_post_xml_data_requests(url, xml_data)
 
+        print(data)
+        print(rep.text)
         ss = rep.text.encode('raw_unicode_escape')
         print(ss.decode())
 
