@@ -449,7 +449,7 @@ def weixin_pay():
         rep = client_post_xml_data_requests(url, xml_data)
 
         ss = rep.text.encode('raw_unicode_escape')
-        # print(ss.decode())
+        print(ss.decode())
 
         return jsonify({'return_code': 'SUCCESS'})
 

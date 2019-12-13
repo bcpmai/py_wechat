@@ -53,7 +53,7 @@ CREATE TABLE `member_types` (
 
 CREATE TABLE `repair_order` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `sn` varchar(20) NOT NULL,
+  `sn` varchar(20) NOT NULL DEFAULT '',
   `transaction_id` varchar(32) NOT NULL DEFAULT '' COMMENT '微信订单号',
   `mobile` varchar(20) NOT NULL COMMENT '电话',
   `name` varchar(20) NOT NULL COMMENT '姓名',
