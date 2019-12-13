@@ -369,7 +369,8 @@ def get_member_wxname():
     :return:
     """
     records = list()
-    insert_address_sql = "SELECT * FROM member where wx_name='123'"
+    wx_name = request.form['wx_name']
+    insert_address_sql = "SELECT * FROM member where wx_name='{wx_name}'".format(wx_name=wx_name)
     res = db_session.execute(insert_address_sql).fetchall()
     for temp in res:
         records.append(dict(temp))
@@ -485,6 +486,10 @@ def notice_weixin_payment():
 
 @api_bp.route('/weixin-pay', methods=["POST"])
 def weixin_pay():
+    """
+    微信下单支付接口
+    :return:
+    """
 
     if request.method == 'POST':
         data = request.get_data()
@@ -498,8 +503,8 @@ def weixin_pay():
         # 商户号 前端获取
         data['mch_id'] = json_data_dict['mch_id']
 
-        # 商户号 前端获取
-        data['mch_id'] = json_data_dict['open_id']
+        # open_id
+        data['open_id'] = json_data_dict['open_id']
 
         # API 秘钥KEY
         api_key = json_data_dict['api_key']
@@ -511,17 +516,21 @@ def weixin_pay():
         data['nonce_str'] = nonce_str
         # 商品名称
         data['body'] = 'service'
-        # 订单号由订单生成时产生 todo
-        data['out_trade_no'] = '12314'
 
         # 下单金额 前端获取 微信规则必须是整数
-        data['total_fee'] = json_data_dict['total_fee']
+        data['total_fee'] = int(json_data_dict['total_fee']*100)
         # 终端IP，由前端获取
         data['spbill_create_ip'] = json_data_dict['ip']
         # 线上通知回调地址
         data['notify_url'] = 'http://yije.xiusha.net/notice-weixin-payment'
         # 交易类型
         data['trade_type'] = 'JSAPI'
+
+        # 订单号由订单生成时产生 todo
+        data['out_trade_no'] = json_data_dict['out_trade_no']
+
+        # todo ...
+        total_fee = json_data_dict['total_fee']
 
         # 生成md5算法的sign
         sort_dict_key = sorted(data.keys())
