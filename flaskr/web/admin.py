@@ -5,13 +5,15 @@ import time
 import traceback
 from flask import Flask, session, redirect, url_for
 from flask import Blueprint, jsonify, Flask, request, render_template
-from flask_sqlalchemy import SQLAlchemy
 
 from flaskr.common import db_session
+from flaskr.db_model.repair_order import RepairOrder
+from flaskr.web import login_required
 
 admin_bp = Blueprint('admin_bp', __name__)
 
 
+@admin_bp.route('/', methods=["POST", "GET"])
 @admin_bp.route('/admin/login', methods=["POST", "GET"])
 def admin_login():
     """
@@ -29,23 +31,23 @@ def admin_login():
     return render_template('login.html')
 
 
+@login_required
 @admin_bp.route('/admin/index')
 def admin_index():
     """
     后台用户主界面
     :return:
     """
-    check_login()
     return render_template('index.html')
 
 
+@login_required
 @admin_bp.route('/admin/member/list')
 def admin_member_list():
     """
     后台用户列表
     :return:
     """
-    check_login()
 
     records = list()
 
@@ -59,37 +61,41 @@ def admin_member_list():
 
     return render_template('member-list.html', records=records)
 
+
+@login_required
 @admin_bp.route('/admin/order/list')
 def admin_order_list():
     """
     后台订单列表
     :return:
     """
-    check_login()
+    # records = list()
+    #
+    # query_address_sql = "SELECT * FROM repair_order "
+    # res = db_session.execute(query_address_sql).fetchall()
+    #
+    # for temp in res:
+    #     records.append(dict(temp))
+    #
+    # db_session.close()
 
-    records = list()
+    page = request.args.get('page', 1)
 
-    query_address_sql = "SELECT * FROM repair_order "
-    res = db_session.execute(query_address_sql).fetchall()
+    pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 5)
+    return render_template('order-list.html', pagination=pagination, records=pagination.items)
 
-    for temp in res:
-        records.append(dict(temp))
 
-    db_session.close()
-
-    return render_template('order-list.html', records=records)
-
+@login_required
 @admin_bp.route('/admin/memberType/list')
-def admin_memberType_list():
+def admin_member_type_list():
     """
     会员类型列表
     :return:
     """
-    check_login()
 
     records = list()
 
-    query_address_sql = "SELECT * FROM membertypes "
+    query_address_sql = "SELECT * FROM member_types "
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
@@ -99,17 +105,20 @@ def admin_memberType_list():
 
     return render_template('member-type-list.html', records=records)
 
+
+@login_required
 @admin_bp.route('/admin/memberType/add')
-def admin_memberType_add():
+def admin_member_type_add():
     """
     添加会员类型
     :return:
     """
-
     return render_template('member-type-add.html')
 
+
+@login_required
 @admin_bp.route('/admin/memberTypes/submit', methods=["POST"])
-def submit_memberTypes():
+def submit_member_types():
     """
     提交会员类型
     :return:
@@ -125,12 +134,15 @@ def submit_memberTypes():
 
         try:
 
-            insert_address_sql = "insert into membertypes (member_title,member_price,member_limit,member_describe,member_details,created_at,updated_at) " \
-                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}','{member_details}',{created_at},{updated_at})". \
-                format(member_title=member_title, member_price=member_price, member_limit=member_limit, member_describe=member_describe, member_details=member_details, created_at=created_at, updated_at=updated_at)
+            insert_address_sql = "insert into member_types (member_title,member_price,member_limit," \
+                                 "member_describe,member_details,created_at,updated_at) " \
+                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}'," \
+                                 "'{member_details}',{created_at},{updated_at})". \
+                format(member_title=member_title, member_price=member_price, member_limit=member_limit,
+                       member_describe=member_describe, member_details=member_details, created_at=created_at,
+                       updated_at=updated_at)
 
             db_session.execute(insert_address_sql)
-
             db_session.commit()
         except Exception:
             print(traceback.format_exc())
@@ -139,8 +151,10 @@ def submit_memberTypes():
 
         return jsonify({'success': True, 'msg': 'save ok'})
 
+
+@login_required
 @admin_bp.route('/admin/memberType/delete', methods=["POST"])
-def delete_memberType():
+def delete_member_type():
     """
     我要报修
     :return:
@@ -150,10 +164,9 @@ def delete_memberType():
 
         try:
 
-            insert_address_sql = "delete from membertypes where id={id}".format(id=id)
+            insert_address_sql = "delete from member_types where id={id}".format(id=id)
 
             db_session.execute(insert_address_sql)
-
             db_session.commit()
         except Exception:
             print(traceback.format_exc())
@@ -162,6 +175,8 @@ def delete_memberType():
 
         return jsonify({'success': True, 'msg': 'delete ok'})
 
+
+@login_required
 @admin_bp.route('/admin/order/delete', methods=["POST"])
 def delete_order():
     """
@@ -169,11 +184,11 @@ def delete_order():
     :return:
     """
     if request.method == 'POST':
-        id = request.form['id']
+        repair_order = request.form['id']
 
         try:
 
-            insert_address_sql = "delete from repair_order where id={id}".format(id=id)
+            insert_address_sql = "delete from repair_order where id={id}".format(id=repair_order)
 
             db_session.execute(insert_address_sql)
 
@@ -181,20 +196,18 @@ def delete_order():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
-            return jsonify({'success': False, 'msg': 'delete date error'})
+            return jsonify({'success': False, 'msg': 'delete data error'})
 
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
-
+@login_required
 @admin_bp.route('/admin/types/list')
 def admin_types_list():
     """
     后台类型列表
     :return:
     """
-    check_login()
-
     records = list()
 
     query_address_sql = "SELECT * FROM types LEFT JOIN types_category ON types.id=types_category.type_id"
@@ -217,14 +230,14 @@ def admin_types_add():
 
     return render_template('types-add.html')
 
+
+@login_required
 @admin_bp.route('/admin/typesCategory/add')
-def admin_typesCategory_add():
+def admin_types_category_add():
     """
     添加清洗类型
     :return:
     """
-    check_login()
-
     records = list()
 
     query_address_sql = "SELECT * FROM types "
@@ -237,8 +250,10 @@ def admin_typesCategory_add():
 
     return render_template('types-category-add.html', records=records)
 
+
+@login_required
 @admin_bp.route('/admin/typesCategory/submit', methods=["POST"])
-def submit_typesCategory():
+def submit_types_category():
     """
     我要报修
     :return:
@@ -254,7 +269,8 @@ def submit_typesCategory():
 
             insert_address_sql = "insert into types_category (category_name,price,type_id,created_at,updated_at) " \
                                  "values ('{category_name}',{price},{type_id},{created_at},{updated_at})". \
-                format(category_name=type_name, price=price, type_id=type_id, created_at=created_at, updated_at=updated_at)
+                format(category_name=type_name, price=price, type_id=type_id, created_at=created_at,
+                       updated_at=updated_at)
 
             db_session.execute(insert_address_sql)
 
@@ -267,6 +283,7 @@ def submit_typesCategory():
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
+@login_required
 @admin_bp.route('/admin/types/submit', methods=["POST"])
 def submit_types():
     """
@@ -295,6 +312,7 @@ def submit_types():
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
+@login_required
 @admin_bp.route('/admin/types/delete', methods=["POST"])
 def delete_types():
     """
@@ -302,14 +320,12 @@ def delete_types():
     :return:
     """
     if request.method == 'POST':
-        id = request.form['id']
+        types_id = request.form['id']
 
         try:
 
-            insert_address_sql = "delete from types where id={id}".format(id=id)
-
+            insert_address_sql = "delete from types where id={id}".format(id=types_id)
             db_session.execute(insert_address_sql)
-
             db_session.commit()
         except Exception:
             print(traceback.format_exc())
@@ -325,23 +341,19 @@ def admin_logout():
     后台用户退出
     :return:
     """
-    check_login()
+    # check_login()
 
     session.pop('username')
 
     return redirect('/admin/login')
 
+# def check_login():
+#     """
+#     检查登录
+#     :return:
+#     """
+#     if session.get('username') != 'admin_login':
+#         return redirect('/admin/login')
 
-def check_login():
-    """
-    检查登录
-    :return:
-    """
-    if session.get('username') != 'admin_login':
-        return redirect('/admin/login')
-
-
-
-
-    # data_sj = time.localtime(time_sj)
-    # time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)
+# data_sj = time.localtime(time_sj)
+# time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)

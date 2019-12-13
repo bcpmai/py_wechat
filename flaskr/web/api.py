@@ -6,110 +6,10 @@ import time
 import traceback
 from decimal import Decimal
 import requests
-import xml.sax.handler
-import hashlib
-
 
 from flask import Blueprint, jsonify, request
 from flaskr.common import db_session
-
-
-class XMLHandler(xml.sax.handler.ContentHandler):
-    """
-    子类实现xml功能
-    """
-
-    def __init__(self):
-        self.buffer = ""
-        self.mapping = {}
-
-    def startElement(self, name, attributes):
-        self.buffer = ""
-
-    def characters(self, data):
-        self.buffer += data
-
-    def endElement(self, name):
-        self.mapping[name] = self.buffer
-
-    def get_dict(self):
-        return self.mapping
-
-
-def xml_to_dict(xml_str):
-    """
-    转换xml为字典
-    :param xml_str:
-    :return:
-    """
-    xh = XMLHandler()
-    xml.sax.parseString(xml_str.encode(), xh)
-    ret = xh.get_dict()
-    return ret
-
-
-def dict_to_xml(target_dict):
-    """
-    转换字典为xml
-    :param target_dict:
-    :return:
-    """
-    item = ""
-    for k, v in target_dict.items():
-        item += "<{k}>{v}</{k}>".format(k=k, v=v)
-
-    message = "<xml>" + item + "</xml>"
-    return message
-
-
-def md5(target_str):
-    """
-    随机生成字符串
-    :param target_str:
-    :return:
-    """
-    m = hashlib.md5()
-    b = target_str.encode(encoding='utf-8')
-    m.update(b)
-    str_md5 = m.hexdigest()
-
-    return str_md5
-
-
-def client_post_xml_data_requests(request_url, request_xml_data):
-    """
-    功能说明：发送请求报文到指定的地址并获取请求响应报文
-    输入参数说明：接收请求的URL，xml请求报文数据
-    输出参数：请求响应报文
-    :param request_url:
-    :param request_xml_data:
-    :return:
-    """
-
-    head = {"Content-Type": "text/xml; charset=UTF-8", 'Connection': 'close'}
-
-    # 客户端发送请求报文到服务端
-    r = requests.post(request_url, data=request_xml_data, headers=head)
-    # 客户端获取服务端的响应报文数据
-
-    # 返回请求响应报文
-    return r
-
-
-def get_random(star, end):
-    """
-    获取随机数
-    :return:
-    """
-    r = random.randint(star, end)
-    res_random = r
-    if r < 10:
-        res_random = '0'+'0'+str(r)
-    if r >=10 and r<100:
-        res_random = '0' + str(r)
-
-    return str(res_random)
-
+from flaskr.common.utils import get_random, md5, dict_to_xml, client_post_xml_data_requests
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -156,7 +56,7 @@ def add_member():
         data = request.get_data()
         json_data_dict = json.loads(data.decode("utf-8"))
 
-        name = json_data_dict.get('name', '')
+        member_name = json_data_dict.get('name', '')
         address = json_data_dict.get('address', '')
         mobile = json_data_dict.get('mobile', '')
         wx_code = json_data_dict.get('wxCode', '')
@@ -170,11 +70,13 @@ def add_member():
         try:
 
             insert_address_sql = "insert into member " \
-                                 "(user_name,address,mobile,created_at,updated_at,wx_code,warranty_time,is_member,member_grade) " \
-                                 "values ('{user_name}','{address}','{mobile}',{created_at},{updated_at},'{wx_code}'," \
+                                 "(username,address,mobile,created_at," \
+                                 "updated_at,wx_code,warranty_time,is_member,member_grade) " \
+                                 "values (" \
+                                 "'{member_name}','{address}','{mobile}',{created_at},{updated_at},'{wx_code}'," \
                                  "'{warranty_time}','{is_member}','{member_grade}')". \
                 format(
-                user_name=name, address=address, mobile=mobile, created_at=created_at, updated_at=updated_at,
+                member_name=member_name, address=address, mobile=mobile, created_at=created_at, updated_at=updated_at,
                 wx_code=wx_code, warranty_time=warranty_time, is_member=is_member, member_grade=member_grade)
 
             db_session.execute(insert_address_sql)
@@ -257,7 +159,7 @@ def get_orders():
 
 
 @api_bp.route('/get-membertypes')
-def get_membertypes():
+def get_member_types():
     """
     后台类型列表
     :return:
@@ -266,7 +168,7 @@ def get_membertypes():
     records = list()
     try:
 
-        query_address_sql = "SELECT * FROM membertypes "
+        query_address_sql = "SELECT * FROM member_types "
         res = db_session.execute(query_address_sql).fetchall()
 
         for temp in res:
@@ -398,7 +300,7 @@ def get_open_id():
     try:
 
         url = "https://api.weixin.qq.com/sns/jscode2session?" \
-              "appid={app_id}&secret={app_secret}&js_code={code}&grant_type=authorization_code".\
+              "appid={app_id}&secret={app_secret}&js_code={code}&grant_type=authorization_code". \
             format(app_id=app_id, app_secret=app_secret, code=code)
         r = requests.get(url)
         wx_res_dict = json.loads(r.text)
@@ -439,11 +341,11 @@ def notice_weixin_payment():
         # 微信金额保存均已整型保存
         # 比较订单金额以及支付金额是否一致
         total_fee = json_data_dict.get('total_fee', 0)
-        total_fee = total_fee/100
+        total_fee = total_fee / 100
         total_fee = Decimal(total_fee).quantize(Decimal("0.00"))
 
         settlement_total_fee = json_data_dict.get('settlement_total_fee', 0)
-        settlement_total_fee = settlement_total_fee/100
+        settlement_total_fee = settlement_total_fee / 100
         settlement_total_fee = Decimal(settlement_total_fee).quantize(Decimal("0.00"))
 
         # 支付状态为0
@@ -470,7 +372,7 @@ def notice_weixin_payment():
 
     try:
         # 修改订单数据
-        update_sql = "update repair_order set  pay_type={pay_type}, transaction_id={transaction_id}, " \
+        update_sql = "update repair_order set pay_type={pay_type}, transaction_id={transaction_id}, " \
                      "pay_price = {settlement_total_fee} ,time_end ={time_end} where sn={sn} ". \
             format(pay_type=pay_type, transaction_id=transaction_id, settlement_total_fee=settlement_total_fee,
                    time_end=time_end, sn=out_trade_no)
@@ -486,11 +388,14 @@ def notice_weixin_payment():
 
 @api_bp.route('/weixin-pay', methods=["POST"])
 def weixin_pay():
+<<<<<<< HEAD
     """
     微信下单支付接口
     :return:
     """
 
+=======
+>>>>>>> d1431f8004e76a666eb0d6b76ceccbdccabd16bc
     if request.method == 'POST':
         data = request.get_data()
         json_data_dict = json.loads(data.decode("utf-8"))
@@ -554,7 +459,3 @@ def weixin_pay():
 
     else:
         return jsonify({'return_code': 'FAIL'})
-
-
-
-
