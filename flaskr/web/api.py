@@ -40,8 +40,10 @@ def bind_address():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -85,8 +87,9 @@ def add_member():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
-
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -130,8 +133,9 @@ def add_order():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
-
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -154,8 +158,9 @@ def get_orders():
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
-
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -174,13 +179,14 @@ def get_member_types():
 
         for temp in res:
             records.append(dict(temp))
-            db_session.close()
+
 
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
-
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -199,13 +205,14 @@ def get_types():
 
         for temp in res:
             records.append(dict(temp))
-            db_session.close()
 
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
 
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -232,8 +239,10 @@ def get_types_category():
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
 
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -261,8 +270,10 @@ def get_repair_order():
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
 
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -279,6 +290,7 @@ def get_member_wxname():
     for temp in res:
         records.append(dict(temp))
 
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -294,6 +306,7 @@ def get_member_wxcode():
     for temp in res:
         records.append(dict(temp))
 
+    db_session.close()
     return jsonify({'success': True, 'list': records})
 
 
@@ -322,10 +335,12 @@ def get_member_wxcode_update():
     try:
         db_session.execute(update_sql)
         db_session.commit()
+        db_session.close()
         return jsonify({'success': True})
     except Exception:
         print(traceback.format_exc())
         db_session.rollback()
+        db_session.close()
         return jsonify({'success': False})
 
 
@@ -354,12 +369,14 @@ def get_open_id():
             format(app_id=app_id, app_secret=app_secret, code=code)
         r = requests.get(url)
         wx_res_dict = json.loads(r.text)
+        db_session.close()
         return jsonify(
             {
                 'success': True,
                 'openid': wx_res_dict['openid'], 'session_key': wx_res_dict['session_key'], 'msg': 'get data success'})
 
     except Exception:
+        db_session.close()
         return jsonify({'success': False, 'msg': 'search error'})
 
 
@@ -371,7 +388,7 @@ def save_order_and_payment():
     """
     sn = str(int(time.time())) + get_random(1, 999)
     print(sn)
-
+    db_session.close()
     try:
         return jsonify({'success': True, 'msg': 'error'})
     except Exception:
@@ -429,10 +446,11 @@ def notice_weixin_payment():
 
         db_session.execute(update_sql)
         db_session.commit()
-
+        db_session.close()
         return jsonify({'return_code': 'SUCCESS'})
     except Exception:
         db_session.rollback()
+        db_session.close()
         return jsonify({'return_code': 'FAIL'})
 
 
@@ -507,10 +525,12 @@ def weixin_pay():
 
         res = xml_to_dict(xml_res_str)
 
+        db_session.close()
         if res.get('return_code','') == 'SUCCESS':
             return jsonify({'return_code': 'SUCCESS', 'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
         else:
             return jsonify({'return_code': 'FAIL'})
 
     else:
+        db_session.close()
         return jsonify({'return_code': 'FAIL'})
