@@ -495,8 +495,8 @@ def weixin_pay():
         # 线上通知回调地址
         data['notify_url'] = 'http://yije.xiusha.net/notice-weixin-payment'
         # 交易类型
-        # data['trade_type'] = 'JSAPI'
-        data['trade_type'] = 'NATIVE'
+        data['trade_type'] = 'JSAPI'
+        # data['trade_type'] = 'NATIVE'
 
         # 订单号由订单生成时产生 todo
         data['out_trade_no'] = json_data_dict['out_trade_no']
