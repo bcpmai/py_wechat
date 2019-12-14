@@ -8,6 +8,7 @@ from flask import Blueprint, jsonify, Flask, request, render_template
 
 from flaskr.common import db_session, password
 from flaskr.common.utils import timestamp_to_date
+from flaskr.db_model.member import Member
 from flaskr.db_model.repair_order import RepairOrder
 from flaskr.web import login_required
 
@@ -50,21 +51,17 @@ def admin_member_list():
     :return:
     """
 
+    page = request.args.get('page', 1)
+    pagination = Member.query.order_by(Member.id.desc()).paginate(int(page), 10)
+
     records = list()
-
-    query_address_sql = "SELECT * FROM member "
-    res = db_session.execute(query_address_sql).fetchall()
-
-    for temp in res:
-        # temp.created_at = timestamp_to_date(temp.created_at)
-        temp = dict(temp)
-        temp['created_at'] = timestamp_to_date(temp['created_at'])
-        temp['updated_at'] = timestamp_to_date(temp['updated_at'])
-        records.append(temp)
+    for items in pagination.items:
+        items.created_at = timestamp_to_date(items.created_at)
+        items.updated_at = timestamp_to_date(items.updated_at)
+        records.append(items)
 
     db_session.close()
-
-    return render_template('member-list.html', records=records)
+    return render_template('member-list.html', pagination=pagination, records=records)
 
 
 @admin_bp.route('/admin/order/list')
@@ -74,18 +71,7 @@ def admin_order_list():
     后台订单列表
     :return:
     """
-    # records = list()
-    #
-    # query_address_sql = "SELECT * FROM repair_order "
-    # res = db_session.execute(query_address_sql).fetchall()
-    #
-    # for temp in res:
-    #     records.append(dict(temp))
-    #
-    # db_session.close()
-
     page = request.args.get('page', 1)
-
     pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 10)
 
     records = list()
@@ -93,7 +79,37 @@ def admin_order_list():
         items.created_at = timestamp_to_date(items.created_at)
         records.append(items)
 
+    db_session.close()
     return render_template('order-list.html', pagination=pagination, records=records)
+
+
+@admin_bp.route('/admin/order/edit/status', methods=["POST", "GET"])
+@login_required
+def admin_order_status_edit():
+    """
+    后台订单列表状态数据编辑
+    :return:
+    """
+
+    if request.method == 'POST':
+        updated_at = int(time.time())
+        order_id = request.form['order_id']
+
+        try:
+
+            update_sql = "update repair_order set status = 1,updated_at={updated_at} where id={order_id}".\
+                format(order_id=order_id, updated_at=updated_at)
+
+            db_session.execute(update_sql)
+            db_session.commit()
+        except Exception:
+            print(traceback.format_exc())
+            db_session.rollback()
+            db_session.close()
+            return jsonify({'success': False, 'msg': 'save date error'})
+
+        db_session.close()
+        return jsonify({'success': True, 'msg': 'update ok'})
 
 
 @admin_bp.route('/admin/memberType/list')
@@ -158,8 +174,10 @@ def submit_member_types():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -182,8 +200,10 @@ def delete_member_type():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'delete date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
@@ -206,8 +226,10 @@ def delete_order():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'delete data error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
@@ -224,6 +246,10 @@ def admin_types_list():
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
+        temp = dict(temp)
+        temp['created_at'] = timestamp_to_date(temp['created_at'])
+        temp['updated_at'] = timestamp_to_date(temp['updated_at'])
+
         records.append(dict(temp))
 
     db_session.close()
@@ -284,13 +310,14 @@ def submit_types_category():
                        updated_at=updated_at)
 
             db_session.execute(insert_address_sql)
-
             db_session.commit()
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -318,8 +345,10 @@ def submit_types():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'save date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
@@ -341,8 +370,10 @@ def delete_types():
         except Exception:
             print(traceback.format_exc())
             db_session.rollback()
+            db_session.close()
             return jsonify({'success': False, 'msg': 'delete date error'})
 
+        db_session.close()
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
@@ -353,7 +384,6 @@ def admin_logout():
     后台用户退出
     :return:
     """
-
     session.pop('username')
 
     return redirect('/admin/login')

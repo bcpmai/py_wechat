@@ -48,13 +48,13 @@
                 {#                                </div>#}
                 {#                            </form>#}
                 {#                        </div>#}
-                <div class="layui-card-header">
-                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除
-                    </button>
-                    <button class="layui-btn" onclick="xadmin.open('添加会员类型','/admin/memberType/add',600,400)"><i
-                            class="layui-icon"></i>添加
-                    </button>
-                </div>
+{#                <div class="layui-card-header">#}
+{#                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除#}
+{#                    </button>#}
+{#                    <button class="layui-btn" onclick="xadmin.open('添加会员类型','/admin/memberType/add',600,400)"><i#}
+{#                            class="layui-icon"></i>添加#}
+{#                    </button>#}
+{#                </div>#}
                 <div class="layui-card-body layui-table-body layui-table-main">
                     <table class="layui-table layui-form">
                         <thead>
@@ -65,7 +65,7 @@
                             <th>限制</th>
                             <th>使用次数</th>
                             <th>描述</th>
-                            <th>操作</th>
+{#                            <th>操作</th>#}
                         </thead>
                         <tbody>
                         {% for user in records %}
@@ -80,12 +80,12 @@
                                 <td>{{ user.member_limit|title }}</td>
                                 <td>{{ user.number|title }}</td>
                                 <td>{{ user.member_describe|title }}</td>
-                                <td class="td-manage">
+{#                                <td class="td-manage">#}
 {#                                    <a title="编辑" onclick="xadmin.open('编辑','/admin/memberType/add?id={{ user.id }}')" href="javascript:;">#}
 {#                                        <i class="layui-icon">&#xe63c;</i></a>#}
-                                    <a title="删除" onclick="member_del(this,{{ user.id }})" href="javascript:;">
-                                        <i class="layui-icon">&#xe640;</i></a>
-                                </td>
+{#                                    <a title="删除" onclick="member_del(this,{{ user.id }})" href="javascript:;">#}
+{#                                        <i class="layui-icon">&#xe640;</i></a>#}
+{#                                </td>#}
                             </tr>
                         {% endfor %}
                         </tbody>
