@@ -527,10 +527,60 @@ def weixin_pay():
 
         db_session.close()
         if res.get('return_code','') == 'SUCCESS':
-            return jsonify({'return_code': 'SUCCESS', 'xml_data':xml_data,'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
+
+            data = dict()
+            data['timeStamp'] = int(time.time())
+            str_random = str(int(time.time()) + random.randint(1, 1000))
+            data['nonceStr'] = md5(str_random)
+            data['package'] = 'prepay_id={prepay_id}'.format(prepay_id=res.get('prepay_id',''))
+            data['signType'] = 'MD5'
+
+            sort_dict_key = sorted(data.keys())
+            key_value_str_list = list()
+            for k in sort_dict_key:
+                key_value_str = "{k}={v}".format(k=k, v=data[k])
+                key_value_str_list.append(key_value_str)
+
+            string_sign_temp = "&".join(key_value_str_list) + '&key={key}'.format(key=api_key)
+            sign = md5(string_sign_temp).upper()
+            data['paySign'] = sign
+
+            # return jsonify({'return_code': 'SUCCESS', 'xml_data':xml_data,'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
+            return jsonify({'return_code': 'SUCCESS', 'data':data})
         else:
             return jsonify({'return_code': 'FAIL','msg':xml_res_str})
 
     else:
         db_session.close()
         return jsonify({'return_code': 'FAIL'})
+
+
+# @api_bp.route('/weixin-request-payment', methods=["POST"])
+# def weixin_request_payment():
+#     if request.method == 'POST':
+#         http_data = request.get_data()
+#         json_data_dict = json.loads(http_data.decode("utf-8"))
+#
+#         data = dict()
+#         data['timeStamp'] = int(time.time())
+#
+#         str_random = str(int(time.time()) + random.randint(1, 1000))
+#         data['nonceStr'] = md5(str_random)
+#         data['package'] = json_data_dict['package']
+#         data['signType'] = 'MD5'
+#         api_key = json_data_dict['api_key']
+#
+#         # 生成md5算法的sign
+#         sort_dict_key = sorted(data.keys())
+#         key_value_str_list = list()
+#         for k in sort_dict_key:
+#             key_value_str = "{k}={v}".format(k=k, v=data[k])
+#             key_value_str_list.append(key_value_str)
+#
+#         string_sign_temp = "&".join(key_value_str_list) + '&key={key}'.format(key=api_key)
+#
+#         sign = md5(string_sign_temp).upper()
+#
+#         data['paySign'] = sign
+
+
