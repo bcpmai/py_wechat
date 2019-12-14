@@ -6,7 +6,7 @@ import traceback
 from flask import Flask, session, redirect, url_for
 from flask import Blueprint, jsonify, Flask, request, render_template
 
-from flaskr.common import db_session
+from flaskr.common import db_session, password
 from flaskr.db_model.repair_order import RepairOrder
 from flaskr.web import login_required
 
@@ -24,7 +24,7 @@ def admin_login():
         admin_name = request.form['admin_name']
         admin_password = request.form['admin_password']
 
-        if admin_name == 'admin' and admin_password == 'test123456':
+        if admin_name == 'admin' and admin_password == password:
             session['username'] = 'admin_login'
             return redirect('/admin/index')
 

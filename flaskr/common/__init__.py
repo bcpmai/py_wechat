@@ -15,6 +15,7 @@ app = Flask(__name__)
 dotenv_path = os.path.join(os.path.dirname(app.instance_path), '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+password = os.getenv('password', '')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('mysql_link', '')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
