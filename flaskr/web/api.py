@@ -9,7 +9,8 @@ import requests
 
 from flask import Blueprint, jsonify, request
 from flaskr.common import db_session
-from flaskr.common.utils import get_random, md5, dict_to_xml, client_post_xml_data_requests, xml_to_dict
+from flaskr.common.utils import get_random, md5, dict_to_xml, client_post_xml_data_requests, xml_to_dict, \
+    timestamp_to_date
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -268,6 +269,8 @@ def get_repair_order():
             temp = dict(temp)
             temp['price'] = str(temp['price'])
             temp['pay_price'] = str(temp['pay_price'])
+            temp['created_at'] = timestamp_to_date(temp['created_at'])
+            temp['updated_at'] = timestamp_to_date(temp['updated_at'])
 
             records.append(temp)
 
