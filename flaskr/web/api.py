@@ -471,6 +471,8 @@ def weixin_pay():
         data['appid'] = json_data_dict['appid']
         # 商户号 前端获取
         data['mch_id'] = json_data_dict['mch_id']
+        # 获取时间戳信息
+        time_stamp = json_data_dict['timeStamp']
 
         # open_id
         data['openid'] = json_data_dict['open_id']
@@ -529,7 +531,7 @@ def weixin_pay():
         if res.get('return_code','') == 'SUCCESS':
 
             data = dict()
-            data['timeStamp'] = int(time.time())
+            data['timeStamp'] = time_stamp
             str_random = str(int(time.time()) + random.randint(1, 1000))
             data['nonceStr'] = md5(str_random)
             data['package'] = 'prepay_id={prepay_id}'.format(prepay_id=res.get('prepay_id',''))
