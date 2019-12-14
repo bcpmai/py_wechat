@@ -250,7 +250,7 @@ def admin_types_list():
         temp['created_at'] = timestamp_to_date(temp['created_at'])
         temp['updated_at'] = timestamp_to_date(temp['updated_at'])
 
-        records.append(dict(temp))
+        records.append(temp)
 
     db_session.close()
 

@@ -265,7 +265,11 @@ def get_repair_order():
         insert_address_sql = "SELECT * FROM repair_order where status={status} and wx_code='{wx_code}'".format(status=status, wx_code=wx_code)
         res = db_session.execute(insert_address_sql).fetchall()
         for temp in res:
-            records.append(dict(temp))
+            temp = dict(temp)
+            temp['price'] = str(temp['price'])
+            temp['pay_price'] = str(temp['pay_price'])
+
+            records.append(temp)
 
     except Exception:
         print(traceback.format_exc())
