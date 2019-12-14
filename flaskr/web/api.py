@@ -550,7 +550,7 @@ def weixin_pay():
             data['paySign'] = sign
 
             # return jsonify({'return_code': 'SUCCESS', 'xml_data':xml_data,'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
-            return jsonify({'return_code': 'SUCCESS', 'data':data})
+            return jsonify({'return_code': 'SUCCESS', 'data':data,'string_sign_temp':string_sign_temp})
         else:
             return jsonify({'return_code': 'FAIL','msg':xml_res_str})
 
