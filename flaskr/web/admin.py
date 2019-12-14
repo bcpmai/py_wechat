@@ -31,8 +31,8 @@ def admin_login():
     return render_template('login.html')
 
 
-@login_required
 @admin_bp.route('/admin/index')
+@login_required
 def admin_index():
     """
     后台用户主界面
@@ -41,8 +41,8 @@ def admin_index():
     return render_template('index.html')
 
 
-@login_required
 @admin_bp.route('/admin/member/list')
+@login_required
 def admin_member_list():
     """
     后台用户列表
@@ -62,8 +62,8 @@ def admin_member_list():
     return render_template('member-list.html', records=records)
 
 
-@login_required
 @admin_bp.route('/admin/order/list')
+@login_required
 def admin_order_list():
     """
     后台订单列表
@@ -81,12 +81,12 @@ def admin_order_list():
 
     page = request.args.get('page', 1)
 
-    pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 5)
+    pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 10)
     return render_template('order-list.html', pagination=pagination, records=pagination.items)
 
 
-@login_required
 @admin_bp.route('/admin/memberType/list')
+@login_required
 def admin_member_type_list():
     """
     会员类型列表
@@ -106,8 +106,8 @@ def admin_member_type_list():
     return render_template('member-type-list.html', records=records)
 
 
-@login_required
 @admin_bp.route('/admin/memberType/add')
+@login_required
 def admin_member_type_add():
     """
     添加会员类型
@@ -116,8 +116,8 @@ def admin_member_type_add():
     return render_template('member-type-add.html')
 
 
-@login_required
 @admin_bp.route('/admin/memberTypes/submit', methods=["POST"])
+@login_required
 def submit_member_types():
     """
     提交会员类型
@@ -152,8 +152,8 @@ def submit_member_types():
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
-@login_required
 @admin_bp.route('/admin/memberType/delete', methods=["POST"])
+@login_required
 def delete_member_type():
     """
     我要报修
@@ -176,8 +176,9 @@ def delete_member_type():
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
-@login_required
+
 @admin_bp.route('/admin/order/delete', methods=["POST"])
+@login_required
 def delete_order():
     """
     我要报修
@@ -200,8 +201,8 @@ def delete_order():
         return jsonify({'success': True, 'msg': 'delete ok'})
 
 
-@login_required
 @admin_bp.route('/admin/types/list')
+@login_required
 def admin_types_list():
     """
     后台类型列表
@@ -221,6 +222,7 @@ def admin_types_list():
 
 
 @admin_bp.route('/admin/types/add')
+@login_required
 def admin_types_add():
     """
     添加清洗类型
@@ -230,8 +232,8 @@ def admin_types_add():
     return render_template('types-add.html')
 
 
-@login_required
 @admin_bp.route('/admin/typesCategory/add')
+@login_required
 def admin_types_category_add():
     """
     添加清洗类型
@@ -250,8 +252,8 @@ def admin_types_category_add():
     return render_template('types-category-add.html', records=records)
 
 
-@login_required
 @admin_bp.route('/admin/typesCategory/submit', methods=["POST"])
+@login_required
 def submit_types_category():
     """
     我要报修
@@ -282,8 +284,8 @@ def submit_types_category():
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
-@login_required
 @admin_bp.route('/admin/types/submit', methods=["POST"])
+@login_required
 def submit_types():
     """
     我要报修
@@ -311,8 +313,8 @@ def submit_types():
         return jsonify({'success': True, 'msg': 'save ok'})
 
 
-@login_required
 @admin_bp.route('/admin/types/delete', methods=["POST"])
+@login_required
 def delete_types():
     """
     我要报修
@@ -335,16 +337,17 @@ def delete_types():
 
 
 @admin_bp.route('/admin/logout')
+@login_required
 def admin_logout():
     """
     后台用户退出
     :return:
     """
-    # check_login()
 
     session.pop('username')
 
     return redirect('/admin/login')
+
 
 # def check_login():
 #     """
@@ -352,7 +355,7 @@ def admin_logout():
 #     :return:
 #     """
 #     if session.get('username') != 'admin_login':
-#         return redirect('/admin/login')
+#         return redirect(url_for('admin_bp.admin_login'))
 
 # data_sj = time.localtime(time_sj)
 # time_str = time.strftime("%Y-%m-%d %H:%M:%S",data_sj)
