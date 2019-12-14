@@ -20,3 +20,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 Base = SQLAlchemy(app)
 db_session = Base.session
+
+
+# _engine = create_engine("mysql+pymysql://{}:{}@{}:{}/{}?charset={}".format(self.username, self.password, self.host, self.port,self.dbname, self.charset),
+# pool_recycle=60)
+# dbsession = sessionmaker(bind=_engine)
+# _session = dbsession()
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()

@@ -108,6 +108,7 @@ def add_order():
         type = json_data_dict.get('type', '')
         types_category = json_data_dict.get('typesCategory', '')
         price = json_data_dict.get('price', '')
+        wx_code = json_data_dict.get('wx_code', '')
 
         created_at = int(time.time())
         updated_at = int(time.time())
@@ -116,12 +117,12 @@ def add_order():
 
             insert_address_sql = "insert into repair_order (" \
                                  "province_code,city_code,name,mobile,address,type,category_name," \
-                                 "price,created_at,updated_at) " \
+                                 "price,created_at,updated_at,wx_code) " \
                                  "values ('{province_code}','{city_code}','{name}','{mobile}','{address}','{type}'," \
-                                 "'{category_name}',{price},{created_at},{updated_at})". \
+                                 "'{category_name}',{price},{created_at},{updated_at},'{wx_code}')". \
                 format(province_code=province_code, city_code=city_code, name=name, mobile=mobile, address=address,
                        type=type, category_name=types_category, price=price,
-                       created_at=created_at, updated_at=updated_at)
+                       created_at=created_at, updated_at=updated_at,wx_code=wx_code)
 
             db_session.execute(insert_address_sql)
 
@@ -248,10 +249,11 @@ def get_repair_order():
         json_data_dict = json.loads(data.decode("utf-8"))
 
         status = json_data_dict.get('status', '')
+        wx_code = json_data_dict.get('wx_code', '')
 
     try:
 
-        insert_address_sql = "SELECT * FROM repair_order where status={status}".format(status=status)
+        insert_address_sql = "SELECT * FROM repair_order where status={status} and wx_code='{wx_code}'".format(status=status, wx_code=wx_code)
         res = db_session.execute(insert_address_sql).fetchall()
         for temp in res:
             records.append(dict(temp))
@@ -278,6 +280,54 @@ def get_member_wxname():
         records.append(dict(temp))
 
     return jsonify({'success': True, 'list': records})
+
+
+@api_bp.route('/get-member-wxcode', methods=["GET"])
+def get_member_wxcode():
+    """
+    :return:
+    """
+    records = list()
+    wx_code = request.args.get('wx_code')
+    insert_address_sql = "SELECT * FROM member where is_member='是' and wx_code='{wx_code}'".format(wx_code=wx_code)
+    res = db_session.execute(insert_address_sql).fetchall()
+    for temp in res:
+        records.append(dict(temp))
+
+    return jsonify({'success': True, 'list': records})
+
+
+@api_bp.route('/get-member-wxcode-update', methods=["GET"])
+def get_member_wxcode_update():
+    """
+    :return:
+    """
+    wx_code = request.args.get('wx_code')
+    query_sql = "SELECT * FROM member where is_member='是' " \
+                "and wx_code='{wx_code}' and warranty_time >= 1".format(wx_code=wx_code)
+    res = db_session.execute(query_sql).first()
+
+    if res is None:
+        return jsonify({'success': False, 'is_member': False})
+
+    res = dict(res)
+
+    if int(res['warranty_time']) > 1:
+        update_sql = "update member set warranty_time = {warranty_time} " \
+                     "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
+    if int(res['warranty_time']) == 1:
+        update_sql = "update member set is_member = '否' ,warranty_time = {warranty_time} " \
+                     "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
+
+    try:
+        db_session.execute(update_sql)
+        db_session.commit()
+        return jsonify({'success': True})
+    except Exception:
+        print(traceback.format_exc())
+        db_session.rollback()
+        return jsonify({'success': False})
+
 
 
 @api_bp.route('/get-open-id', methods=["POST"])
