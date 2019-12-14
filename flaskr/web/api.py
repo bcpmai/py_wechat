@@ -527,7 +527,7 @@ def weixin_pay():
 
         db_session.close()
         if res.get('return_code','') == 'SUCCESS':
-            return jsonify({'return_code': 'SUCCESS', 'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
+            return jsonify({'return_code': 'SUCCESS', 'xml_data':xml_data,'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
         else:
             return jsonify({'return_code': 'FAIL','msg':xml_res_str})
 
