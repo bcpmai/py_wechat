@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import xml.sax.handler
 import hashlib
 import requests
@@ -100,3 +101,13 @@ def get_random(star, end):
         res_random = '0' + str(r)
 
     return str(res_random)
+
+
+def timestamp_to_date(time_stamp):
+    """
+    时间戳转日期
+    :param time_stamp:
+    :return:
+    """
+    time_array = time.localtime(time_stamp)
+    return time.strftime("%Y-%m-%d %H:%M:%S", time_array)

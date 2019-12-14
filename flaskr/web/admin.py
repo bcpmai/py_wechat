@@ -7,6 +7,7 @@ from flask import Flask, session, redirect, url_for
 from flask import Blueprint, jsonify, Flask, request, render_template
 
 from flaskr.common import db_session, password
+from flaskr.common.utils import timestamp_to_date
 from flaskr.db_model.repair_order import RepairOrder
 from flaskr.web import login_required
 
@@ -55,7 +56,11 @@ def admin_member_list():
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
-        records.append(dict(temp))
+        # temp.created_at = timestamp_to_date(temp.created_at)
+        temp = dict(temp)
+        temp['created_at'] = timestamp_to_date(temp['created_at'])
+        temp['updated_at'] = timestamp_to_date(temp['updated_at'])
+        records.append(temp)
 
     db_session.close()
 
@@ -82,7 +87,13 @@ def admin_order_list():
     page = request.args.get('page', 1)
 
     pagination = RepairOrder.query.order_by(RepairOrder.id.desc()).paginate(int(page), 10)
-    return render_template('order-list.html', pagination=pagination, records=pagination.items)
+
+    records = list()
+    for items in pagination.items:
+        items.created_at = timestamp_to_date(items.created_at)
+        records.append(items)
+
+    return render_template('order-list.html', pagination=pagination, records=records)
 
 
 @admin_bp.route('/admin/memberType/list')
@@ -174,7 +185,6 @@ def delete_member_type():
             return jsonify({'success': False, 'msg': 'delete date error'})
 
         return jsonify({'success': True, 'msg': 'delete ok'})
-
 
 
 @admin_bp.route('/admin/order/delete', methods=["POST"])
