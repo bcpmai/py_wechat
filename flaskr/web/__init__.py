@@ -12,8 +12,10 @@ def login_required(view):
     """
     @functools.wraps(view)
     def _(**kwargs):
-        if session.get('admin_name', None) is None:
-            return redirect(url_for('admin_bp.admin_login'))
+        username_session = session.get('username', None)
+        if username_session != 'admin_login':
+            # return redirect(url_for('admin_bp.admin_index'))
+            return redirect('/')
 
         return view(**kwargs)
 
