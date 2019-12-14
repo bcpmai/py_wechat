@@ -43,12 +43,12 @@ CREATE TABLE `member_types` (
   `member_title` varchar(50) NOT NULL COMMENT '会员标题',
   `member_describe` varchar(100) NOT NULL DEFAULT '' COMMENT '会员描述',
   `member_limit` varchar(100) NOT NULL DEFAULT '' COMMENT '会员限制',
-  `member_details` varchar(1000) NOT NULL DEFAULT '' COMMENT '会员详情',
+  `member_details` text NOT NULL COMMENT '会员详情',
   `number` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '使用次数',
   `created_at` int(20) unsigned NOT NULL DEFAULT '0',
   `updated_at` int(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `repair_order` (
@@ -59,7 +59,7 @@ CREATE TABLE `repair_order` (
   `name` varchar(20) NOT NULL COMMENT '姓名',
   `pay_type` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '支付状态 1 已支付，0 未支付, 2 未付完',
   `type` varchar(50) NOT NULL DEFAULT '',
-  `status` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '0进行中\\n1已结束',
+  `status` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '0进行中,已结束',
   `category_name` varchar(50) NOT NULL DEFAULT '' COMMENT '清洁分类',
   `price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '价格',
   `pay_price` decimal(10,2) NOT NULL DEFAULT '0.00',
@@ -67,10 +67,11 @@ CREATE TABLE `repair_order` (
   `city_code` varchar(8) NOT NULL COMMENT '市',
   `address` varchar(50) NOT NULL COMMENT '住址',
   `province_code` varchar(20) NOT NULL COMMENT '省',
-  `created_at` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `wx_code` varchar(50) DEFAULT '',
   `updated_at` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `created_at` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='订单表';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='订单表';
 
 
 CREATE TABLE `types` (

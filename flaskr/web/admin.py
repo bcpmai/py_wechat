@@ -128,7 +128,7 @@ def submit_member_types():
         member_price = request.form['price']
         member_limit = request.form['limit']
         member_describe = request.form['describe']
-        member_details = request.form['details']
+        member_details = request.form.get('details', '')
         created_at = int(time.time())
         updated_at = int(time.time())
 
@@ -160,11 +160,11 @@ def delete_member_type():
     :return:
     """
     if request.method == 'POST':
-        id = request.form['id']
+        member_id = request.form['id']
 
         try:
 
-            insert_address_sql = "delete from member_types where id={id}".format(id=id)
+            insert_address_sql = "delete from member_types where id={id}".format(id=member_id)
 
             db_session.execute(insert_address_sql)
             db_session.commit()
@@ -188,9 +188,8 @@ def delete_order():
 
         try:
 
-            insert_address_sql = "delete from repair_order where id={id}".format(id=repair_order)
-
-            db_session.execute(insert_address_sql)
+            delete_sql = "delete from repair_order where id={id}".format(id=repair_order)
+            db_session.execute(delete_sql)
 
             db_session.commit()
         except Exception:

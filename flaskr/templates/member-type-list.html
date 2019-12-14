@@ -65,7 +65,6 @@
                             <th>限制</th>
                             <th>使用次数</th>
                             <th>描述</th>
-                            <th>详情</th>
                             <th>操作</th>
                         </thead>
                         <tbody>
@@ -81,10 +80,9 @@
                                 <td>{{ user.member_limit|title }}</td>
                                 <td>{{ user.number|title }}</td>
                                 <td>{{ user.member_describe|title }}</td>
-                                <td>{{ user.member_details|title }}</td>
                                 <td class="td-manage">
-                                    <a title="编辑" onclick="xadmin.open('编辑','/admin/memberType/add?id={{ user.id }}')" href="javascript:;">
-                                        <i class="layui-icon">&#xe63c;</i></a>
+{#                                    <a title="编辑" onclick="xadmin.open('编辑','/admin/memberType/add?id={{ user.id }}')" href="javascript:;">#}
+{#                                        <i class="layui-icon">&#xe63c;</i></a>#}
                                     <a title="删除" onclick="member_del(this,{{ user.id }})" href="javascript:;">
                                         <i class="layui-icon">&#xe640;</i></a>
                                 </td>
