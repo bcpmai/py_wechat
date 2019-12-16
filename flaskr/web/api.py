@@ -126,7 +126,7 @@ def add_order():
                                  "'{category_name}',{price},{created_at},{updated_at},'{wx_code}')". \
                 format(province_code=province_code, city_code=city_code, name=name, mobile=mobile, address=address,
                        type=type, category_name=types_category, price=price,
-                       created_at=created_at, updated_at=updated_at,wx_code=wx_code)
+                       created_at=created_at, updated_at=updated_at, wx_code=wx_code)
 
             db_session.execute(insert_address_sql)
 
@@ -263,7 +263,8 @@ def get_repair_order():
 
     try:
 
-        insert_address_sql = "SELECT * FROM repair_order where status={status} and wx_code='{wx_code}'".format(status=status, wx_code=wx_code)
+        insert_address_sql = "SELECT * FROM repair_order where status={status} and wx_code='{wx_code}'".format(
+            status=status, wx_code=wx_code)
         res = db_session.execute(insert_address_sql).fetchall()
         for temp in res:
             temp = dict(temp)
@@ -334,10 +335,10 @@ def get_member_wxcode_update():
 
     if int(res['warranty_time']) > 1:
         update_sql = "update member set warranty_time = {warranty_time} " \
-                     "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
+                     "where wx_code='{wx_code}'".format(wx_code=wx_code, warranty_time=(int(res['warranty_time']) - 1))
     if int(res['warranty_time']) == 1:
         update_sql = "update member set is_member = '否' ,warranty_time = {warranty_time} " \
-                     "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
+                     "where wx_code='{wx_code}'".format(wx_code=wx_code, warranty_time=(int(res['warranty_time']) - 1))
 
     try:
         db_session.execute(update_sql)
@@ -349,7 +350,6 @@ def get_member_wxcode_update():
         db_session.rollback()
         db_session.close()
         return jsonify({'success': False})
-
 
 
 @api_bp.route('/get-open-id', methods=["POST"])
@@ -498,7 +498,7 @@ def weixin_pay():
         data['body'] = 'service'
 
         # 下单金额 前端获取 微信规则必须是整数
-        data['total_fee'] = int(json_data_dict['total_fee']*100)
+        data['total_fee'] = int(json_data_dict['total_fee'] * 100)
         # data['total_fee'] = 7500
         # 终端IP，由前端获取
         data['spbill_create_ip'] = json_data_dict['ip']
@@ -536,14 +536,14 @@ def weixin_pay():
         res = xml_to_dict(xml_res_str)
 
         db_session.close()
-        if res.get('return_code','') == 'SUCCESS':
+        if res.get('return_code', '') == 'SUCCESS':
 
             data = dict()
             data['appId'] = app_id
             data['timeStamp'] = time_stamp
             str_random = str(int(time.time()) + random.randint(1, 1000))
             data['nonceStr'] = md5(str_random)
-            data['package'] = 'prepay_id={prepay_id}'.format(prepay_id=res.get('prepay_id',''))
+            data['package'] = 'prepay_id={prepay_id}'.format(prepay_id=res.get('prepay_id', ''))
             data['signType'] = 'MD5'
 
             sort_dict_key = sorted(data.keys())
@@ -557,14 +557,13 @@ def weixin_pay():
             data['paySign'] = sign
 
             # return jsonify({'return_code': 'SUCCESS', 'xml_data':xml_data,'prepay_id':res.get('prepay_id',''),"sign":res.get('sign','')})
-            return jsonify({'return_code': 'SUCCESS', 'data':data,'string_sign_temp':string_sign_temp})
+            return jsonify({'return_code': 'SUCCESS', 'data': data, 'string_sign_temp': string_sign_temp})
         else:
-            return jsonify({'return_code': 'FAIL','msg':xml_res_str})
+            return jsonify({'return_code': 'FAIL', 'msg': xml_res_str})
 
     else:
         db_session.close()
         return jsonify({'return_code': 'FAIL'})
-
 
 # @api_bp.route('/weixin-request-payment', methods=["POST"])
 # def weixin_request_payment():
@@ -593,5 +592,3 @@ def weixin_pay():
 #         sign = md5(string_sign_temp).upper()
 #
 #         data['paySign'] = sign
-
-
