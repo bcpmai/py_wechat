@@ -59,7 +59,7 @@ def add_member():
         data = request.get_data()
         json_data_dict = json.loads(data.decode("utf-8"))
 
-        member_name = json_data_dict.get('name', '')
+        username = json_data_dict.get('name', '')
         address = json_data_dict.get('address', '')
         mobile = json_data_dict.get('mobile', '')
         wx_code = json_data_dict.get('wxCode', '')
@@ -76,10 +76,10 @@ def add_member():
                                  "(username,address,mobile,created_at," \
                                  "updated_at,wx_code,warranty_time,is_member,member_grade) " \
                                  "values (" \
-                                 "'{member_name}','{address}','{mobile}',{created_at},{updated_at},'{wx_code}'," \
+                                 "'{username}','{address}','{mobile}',{created_at},{updated_at},'{wx_code}'," \
                                  "'{warranty_time}','{is_member}','{member_grade}')". \
                 format(
-                member_name=member_name, address=address, mobile=mobile, created_at=created_at, updated_at=updated_at,
+                username=username, address=address, mobile=mobile, created_at=created_at, updated_at=updated_at,
                 wx_code=wx_code, warranty_time=warranty_time, is_member=is_member, member_grade=member_grade)
 
             db_session.execute(insert_address_sql)
