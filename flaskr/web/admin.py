@@ -146,9 +146,10 @@ def admin_member_type_add():
 
     member_title = ""
     member_price = 0
-    member_limit = 0
+    member_limit = ""
     member_describe = ""
     member_details = ""
+    number = 0
 
     if int(member_id) > 0:
         query_sql = "select * from member_types where id={member_id}".format(member_id=member_id)
@@ -159,10 +160,11 @@ def admin_member_type_add():
         member_limit = res['member_limit']
         member_describe = res['member_describe']
         member_details = res['member_details']
+        number = res['number']
 
     return render_template('member-type-add.html',
                            op_type=op_type, member_id=member_id, member_title=member_title, member_price=member_price,
-                           member_limit=member_limit, member_describe=member_describe,member_details=member_details
+                           member_limit=member_limit, member_describe=member_describe,member_details=member_details,number=number
                            )
 
 
@@ -178,6 +180,7 @@ def member_types_update():
         member_title = request.form['title']
         member_price = request.form['price']
         member_limit = request.form['limit']
+        number = request.form['number']
         member_describe = request.form['describe']
         member_details = request.form.get('details', '')
         updated_at = int(time.time())
@@ -185,11 +188,11 @@ def member_types_update():
         try:
 
             updated_sql = "update member_types set member_title='{member_title}',member_price={member_price}, " \
-                          "member_limit={member_limit},member_describe='{member_describe}'," \
+                          "member_limit={member_limit},member_describe='{member_describe}',number={number}," \
                           "member_details='{member_details}',updated_at={updated_at} " \
                           "where id={id}"\
                 .format(id=member_id, member_title=member_title, member_price=member_price, member_limit=member_limit,
-                        member_describe=member_describe, member_details=member_details, updated_at=updated_at)
+                        member_describe=member_describe, member_details=member_details, updated_at=updated_at,number=number)
 
             db_session.execute(updated_sql)
             db_session.commit()
@@ -214,6 +217,7 @@ def submit_member_types():
         member_title = request.form['title']
         member_price = request.form['price']
         member_limit = request.form['limit']
+        number = request.form['number']
         member_describe = request.form['describe']
         member_details = request.form.get('details', '')
         created_at = int(time.time())
@@ -222,11 +226,11 @@ def submit_member_types():
         try:
 
             insert_address_sql = "insert into member_types (member_title,member_price,member_limit," \
-                                 "member_describe,member_details,created_at,updated_at) " \
-                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}'," \
+                                 "member_describe,number,member_details,created_at,updated_at) " \
+                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}',{number}," \
                                  "'{member_details}',{created_at},{updated_at})". \
                 format(member_title=member_title, member_price=member_price, member_limit=member_limit,
-                       member_describe=member_describe, member_details=member_details, created_at=created_at,
+                       member_describe=member_describe, member_details=member_details, created_at=created_at,number=number,
                        updated_at=updated_at)
 
             db_session.execute(insert_address_sql)

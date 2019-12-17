@@ -52,6 +52,13 @@
         </div>
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
+                <span class="x-red">*</span>使用次数</label>
+            <div class="layui-input-inline">
+                <input type="text" id="number" name="number" required="" lay-verify="required" value="{{ number }}"
+                       autocomplete="off" class="layui-input"></div>
+        </div>
+        <div class="layui-form-item">
+            <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>描述</label>
             <div class="layui-input-inline">
                 <input type="text" id="describe" name="describe" required="" lay-verify="required" value="{{ member_describe }}"
@@ -139,6 +146,7 @@
                         title:$("#title").val(),
                         price:$("#price").val(),
                         limit:$("#limit").val(),
+                        number:$("#number").val(),
                         describe:$("#describe").val(),
                         details:layedit.getContent(layui_content)
                     },
@@ -168,6 +176,7 @@
                         title:$("#title").val(),
                         price:$("#price").val(),
                         limit:$("#limit").val(),
+                        number:$("#number").val(),
                         describe:$("#describe").val(),
                         details:layedit.getContent(layui_content)
                     },
