@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>类型新增</title>
+    <title>欢迎页面-X-admin2.2</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -21,36 +21,43 @@
 </head>
 
 <body>
+
 <div class="layui-fluid">
+    <input type="hidden" id="service_types_id" name="service_types_id" value="{{ service_types_id }}" />
     <div class="layui-row">
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
-            <span class="x-red">*</span>类型名称</label>
+                <span class="x-red">*</span>类型名称</label>
             <div class="layui-input-inline">
                 <select style="padding: 7px 15px" id="type_id">
-                    {% for types in records %}
+                    {% for types in type_records %}
                     <option value="{{ types.id }}">{{ types.type_name|title }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
+
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>分类名称</label>
             <div class="layui-input-inline">
-                <input type="text" id="type_name" name="type_name" required="" lay-verify="required"
-                       autocomplete="off" class="layui-input"></div>
+                <input type="text" id="category_name" name="category_name" required="" lay-verify="required" value="{{ record.category_name }}"
+                       autocomplete="off" class="layui-input">
+            </div>
         </div>
+
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>价格</label>
             <div class="layui-input-inline">
-                <input type="text" id="price" name="price" required="" lay-verify="required"
-                       autocomplete="off" class="layui-input"></div><span style="padding-top: 7px;display: inline-block;">元</span>
+                <input type="text" id="price" name="price" required="" lay-verify="required" value="{{ record.price }}"
+                       autocomplete="off" class="layui-input">
+            </div>
         </div>
+
         <div class="layui-form-item">
             <label for="L_repass" class="layui-form-label"></label>
-            <button class="layui-btn" lay-filter="add" lay-submit="">增加</button>
+            <button class="layui-btn" lay-filter="add" lay-submit="">编辑</button>
         </div>
         </form>
     </div>
@@ -58,40 +65,23 @@
 <script>layui.use(['form', 'layer'],
     function () {
         $ = layui.jquery;
-        var form = layui.form,
-            layer = layui.layer;
-
-        //自定义验证规则
-        form.verify({
-            nikename: function (value) {
-                if (value.length < 5) {
-                    return '昵称至少得5个字符啊';
-                }
-            },
-            pass: [/(.+){6,12}$/, '密码必须6到12位'],
-            repass: function (value) {
-                if ($('#L_pass').val() != $('#L_repass').val()) {
-                    return '两次密码不一致';
-                }
-            }
-        });
+        var form = layui.form, layer = layui.layer;
 
         //监听提交
         form.on('submit(add)',
             function (data) {
-                console.log(data, $("#username").val());
                 $.ajax({
                     type: "post",
-                    url: "/admin/typesCategory/submit",
+                    url: "/admin/service-types-edit?id="+$("#service_types_id").val(),
                     data: {
-                        type_name: $("#type_name").val(),
-                        price:$("#price").val(),
-                        type_id:$("#type_id").val()
+                        type_id: $("#type_id").val(),
+                        category_name: $("#category_name").val(),
+                        price: $("#price").val(),
                     },
                     dataType: "json",
                     success: function (data) {
                         if(data.success) {
-                            layer.alert("增加成功", {
+                            layer.alert("编辑成功", {
                                     icon: 6
                                 },
                                 function () {
@@ -99,6 +89,7 @@
                                     var index = parent.layer.getFrameIndex(window.name);
                                     //关闭当前frame
                                     parent.layer.close(index);
+                                    location.reload();
                                 });
                         }
                     }

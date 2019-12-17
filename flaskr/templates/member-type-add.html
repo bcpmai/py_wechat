@@ -23,33 +23,38 @@
 
 <body>
 <div class="layui-fluid">
+
+    <input type="hidden" id="op_type" name="op_type" value="{{ op_type }}" />
+    <input type="hidden" id="member_id" name="member_id" value="{{ member_id }}" />
+    <input type="hidden" id="member_details" name="member_details" value="{{ member_details }}" />
+
     <div class="layui-row">
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>标题</label>
             <div class="layui-input-inline">
-                <input type="text" id="title" name="title" required="" lay-verify="required"
+                <input type="text" id="title" name="title" required="" lay-verify="required"  value="{{ member_title }}"
                        autocomplete="off" class="layui-input"></div>
         </div>
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>价格</label>
             <div class="layui-input-inline">
-                <input type="text" id="price" name="price" required="" lay-verify="required"
+                <input type="text" id="price" name="price" required="" lay-verify="required" value="{{ member_price }}"
                        autocomplete="off" class="layui-input"></div>
         </div>
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>限制</label>
             <div class="layui-input-inline">
-                <input type="text" id="limit" name="limit" required="" lay-verify="required"
+                <input type="text" id="limit" name="limit" required="" lay-verify="required" value="{{ member_limit }}"
                        autocomplete="off" class="layui-input"></div>
         </div>
         <div class="layui-form-item">
             <label for="typename" class="layui-form-label">
                 <span class="x-red">*</span>描述</label>
             <div class="layui-input-inline">
-                <input type="text" id="describe" name="describe" required="" lay-verify="required"
+                <input type="text" id="describe" name="describe" required="" lay-verify="required" value="{{ member_describe }}"
                        autocomplete="off" class="layui-input"></div>
         </div>
         <div class="layui-form-item">
@@ -59,11 +64,13 @@
 {#                <input type="text" id="details" name="details" required="" lay-verify="required"#}
 {#                       autocomplete="off">#}
 {#            </div>#}
-            <textarea id="details"></textarea>
+            <textarea id="details">
+                {{ member_details }}
+            </textarea>
         </div>
         <div class="layui-form-item">
             <label for="L_repass" class="layui-form-label"></label>
-            <button class="layui-btn" lay-filter="add" lay-submit="">增加</button>
+            <button class="layui-btn" lay-filter="add" lay-submit="">保存</button>
         </div>
         </form>
     </div>
@@ -76,7 +83,6 @@
 
 
             layedit.set({
-                //暴露layupload参数设置接口 --详细查看layupload参数说明
                 uploadImage: {
                     url: '/Attachment/LayUploadFile',
                     accept: 'image',
@@ -116,24 +122,44 @@
             var form = layui.form,
             layer = layui.layer;
 
-        //自定义验证规则
-        form.verify({
-            nikename: function (value) {
-                if (value.length < 5) {
-                    return '昵称至少得5个字符啊';
-                }
-            },
-            pass: [/(.+){6,12}$/, '密码必须6到12位'],
-            repass: function (value) {
-                if ($('#L_pass').val() != $('#L_repass').val()) {
-                    return '两次密码不一致';
-                }
-            }
-        });
+            {#layedit.setContent($("#member_details").val());#}
 
         //监听提交
         form.on('submit(add)',
             function (data) {
+
+            if($("#op_type").val() == 'update'){
+
+                $.ajax({
+                    type: "post",
+                    url: "/admin/member-types/update",
+                    data: {
+                        member_id: $("#member_id").val(),
+                        typename: $("#typename").val(),
+                        title:$("#title").val(),
+                        price:$("#price").val(),
+                        limit:$("#limit").val(),
+                        describe:$("#describe").val(),
+                        details:layedit.getContent(layui_content)
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if(data.success) {
+                            layer.alert("编辑成功", {
+                                    icon: 6
+                                },
+                                function () {
+                                    // 获得frame索引
+                                    var index = parent.layer.getFrameIndex(window.name);
+                                    //关闭当前frame
+                                    parent.layer.close(index);
+                                });
+                        }
+                    }
+                });
+
+
+            }else{
                 $.ajax({
                     type: "post",
                     url: "/admin/memberTypes/submit",
@@ -160,7 +186,7 @@
                         }
                     }
                 });
-
+            }
                 return false;
             });
 
