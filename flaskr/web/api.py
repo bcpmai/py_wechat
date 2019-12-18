@@ -311,7 +311,7 @@ def get_member_wxcode():
     wx_code = request.args.get('wx_code')
     member_grade = request.args.get('member_grade')
     if member_grade == "体验宝":
-        insert_address_sql = "SELECT * FROM member where member_title='体验宝' and wx_code='{wx_code}'".format(
+        insert_address_sql = "SELECT * FROM member where member_grade='体验宝' and wx_code='{wx_code}'".format(
             wx_code=wx_code)
 
     else:
