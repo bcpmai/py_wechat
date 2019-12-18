@@ -122,7 +122,7 @@ def admin_member_type_list():
 
     records = list()
 
-    query_address_sql = "SELECT * FROM member_types "
+    query_address_sql = "SELECT * FROM member_types order by id desc"
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
@@ -140,7 +140,70 @@ def admin_member_type_add():
     添加会员类型
     :return:
     """
-    return render_template('member-type-add.html')
+
+    op_type = request.args.get("type", "")
+    member_id = request.args.get("id", 0)
+
+    member_title = ""
+    member_price = 0
+    member_limit = ""
+    member_describe = ""
+    member_details = ""
+    number = 0
+
+    if int(member_id) > 0:
+        query_sql = "select * from member_types where id={member_id}".format(member_id=member_id)
+        res = db_session.execute(query_sql).first()
+        res = dict(res)
+        member_title = res['member_title']
+        member_price = res['member_price']
+        member_limit = res['member_limit']
+        member_describe = res['member_describe']
+        member_details = res['member_details']
+        number = res['number']
+
+    return render_template('member-type-add.html',
+                           op_type=op_type, member_id=member_id, member_title=member_title, member_price=member_price,
+                           member_limit=member_limit, member_describe=member_describe,member_details=member_details,number=number
+                           )
+
+
+@admin_bp.route('/admin/member-types/update', methods=["POST"])
+@login_required
+def member_types_update():
+    """
+    修改会员类型
+    :return:
+    """
+    if request.method == 'POST':
+        member_id = request.form['member_id']
+        member_title = request.form['title']
+        member_price = request.form['price']
+        member_limit = request.form['limit']
+        number = request.form['number']
+        member_describe = request.form['describe']
+        member_details = request.form.get('details', '')
+        updated_at = int(time.time())
+
+        try:
+
+            updated_sql = "update member_types set member_title='{member_title}',member_price={member_price}, " \
+                          "member_limit={member_limit},member_describe='{member_describe}',number={number}," \
+                          "member_details='{member_details}',updated_at={updated_at} " \
+                          "where id={id}"\
+                .format(id=member_id, member_title=member_title, member_price=member_price, member_limit=member_limit,
+                        member_describe=member_describe, member_details=member_details, updated_at=updated_at,number=number)
+
+            db_session.execute(updated_sql)
+            db_session.commit()
+        except Exception:
+            print(traceback.format_exc())
+            db_session.rollback()
+            db_session.close()
+            return jsonify({'success': False, 'msg': 'modify date error'})
+
+        db_session.close()
+        return jsonify({'success': True, 'msg': 'save ok'})
 
 
 @admin_bp.route('/admin/memberTypes/submit', methods=["POST"])
@@ -148,12 +211,13 @@ def admin_member_type_add():
 def submit_member_types():
     """
     提交会员类型
-    :return:
+    :return:get-member-wxcode-update
     """
     if request.method == 'POST':
         member_title = request.form['title']
         member_price = request.form['price']
         member_limit = request.form['limit']
+        number = request.form['number']
         member_describe = request.form['describe']
         member_details = request.form.get('details', '')
         created_at = int(time.time())
@@ -162,11 +226,11 @@ def submit_member_types():
         try:
 
             insert_address_sql = "insert into member_types (member_title,member_price,member_limit," \
-                                 "member_describe,member_details,created_at,updated_at) " \
-                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}'," \
+                                 "member_describe,number,member_details,created_at,updated_at) " \
+                                 "values ('{member_title}','{member_price}','{member_limit}','{member_describe}',{number}," \
                                  "'{member_details}',{created_at},{updated_at})". \
                 format(member_title=member_title, member_price=member_price, member_limit=member_limit,
-                       member_describe=member_describe, member_details=member_details, created_at=created_at,
+                       member_describe=member_describe, member_details=member_details, created_at=created_at,number=number,
                        updated_at=updated_at)
 
             db_session.execute(insert_address_sql)
@@ -242,8 +306,9 @@ def admin_types_list():
     """
     records = list()
 
-    query_address_sql = "SELECT * FROM types LEFT JOIN types_category ON types.id=types_category.type_id"
-    res = db_session.execute(query_address_sql).fetchall()
+    query_sql = "SELECT t1.id,t1.category_name,t2.type_name,t1.price,t1.created_at,t1.updated_at " \
+                "FROM types_category t1 LEFT JOIN types t2 ON t2.id=t1.type_id"
+    res = db_session.execute(query_sql).fetchall()
 
     for temp in res:
         temp = dict(temp)
@@ -268,6 +333,78 @@ def admin_types_add():
     return render_template('types-add.html')
 
 
+@admin_bp.route('/admin/service-types-edit', methods=["POST", "GET"])
+@login_required
+def service_types_edit():
+    """
+    服务类型编辑
+    :return:
+    """
+    service_types_id = request.args.get("id")
+
+    query_sql = "SELECT t1.id,t1.type_id,t1.category_name,t2.type_name,t1.price,t1.created_at,t1.updated_at " \
+                "FROM types_category t1 LEFT JOIN types t2 ON t2.id=t1.type_id where t1.id ={service_types_id} ".\
+        format(service_types_id=service_types_id)
+    record = db_session.execute(query_sql).first()
+
+    query_type_sql = "select * from types"
+    type_records = list()
+    res = db_session.execute(query_type_sql).fetchall()
+    for temp in res:
+        temp = dict(temp)
+        type_records.append(temp)
+
+    if request.method == 'POST':
+        type_id = request.form['type_id']
+        category_name = request.form['category_name']
+        price = request.form['price']
+
+        try:
+
+            update_sql = "update types_category set price={price},category_name='{category_name}',type_id={type_id} " \
+                         "where id={id}".\
+                format(type_id=type_id, price=price, category_name=category_name, id=service_types_id)
+            db_session.execute(update_sql)
+            db_session.commit()
+            db_session.close()
+
+            return jsonify({'success': True, 'msg': 'modify success'})
+        except Exception:
+            print(traceback.format_exc())
+            db_session.rollback()
+            db_session.close()
+            return jsonify({'success': False, 'msg': 'modify delete'})
+
+    db_session.close()
+    return render_template('service_types_edit.html', service_types_id=service_types_id, type_records=type_records,
+                           record=record)
+
+
+@admin_bp.route('/admin/service_types/del', methods=["POST"])
+@login_required
+def service_types_del():
+    """
+    删除
+    :return:
+    """
+    if request.method == 'POST':
+        types_category_id = request.form['id']
+
+        try:
+            delete_sql = "delete from types_category where id={id}".format(id=types_category_id)
+            db_session.execute(delete_sql)
+
+            db_session.commit()
+        except Exception:
+            print(traceback.format_exc())
+            db_session.rollback()
+            db_session.close()
+            return jsonify({'success': False, 'msg': 'delete data error'})
+
+        db_session.close()
+        return jsonify({'success': True, 'msg': 'delete success'})
+
+
 @admin_bp.route('/admin/typesCategory/add')
 @login_required
 def admin_types_category_add():
@@ -277,7 +414,7 @@ def admin_types_category_add():
     """
     records = list()
 
-    query_address_sql = "SELECT * FROM types "
+    query_address_sql = "SELECT * FROM types order by id desc"
     res = db_session.execute(query_address_sql).fetchall()
 
     for temp in res:
