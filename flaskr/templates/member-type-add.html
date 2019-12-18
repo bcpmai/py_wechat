@@ -90,7 +90,7 @@
 
             layedit.set({
                 uploadImage: {
-                    url: '/Attachment/LayUploadFile',
+                    url: '/admin/upload',
                     accept: 'image',
                     acceptMime: 'image/*',
                     exts: 'jpg|png|gif|bmp|jpeg',
@@ -115,13 +115,12 @@
                     default: 'javascript' //hide为true时的默认语言格式
                 }
                 , tool: [
-                    'html', 'code', 'strong', 'italic', 'underline', 'del', 'addhr', '|', 'fontFomatt', 'colorpicker', 'face'
+                    'html','image','code', 'strong', 'italic', 'underline', 'del', 'addhr', '|', 'fontFomatt', 'colorpicker', 'face'
                     , '|', 'left', 'center', 'right', '|', 'link', 'unlink', 'image_alt', 'video', 'anchors'
                     , '|', 'fullScreen'
                 ]
                 , height: '90%'
             });
-
 
             var layui_content = layedit.build('details');
 
