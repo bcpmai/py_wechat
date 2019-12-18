@@ -188,7 +188,7 @@ def member_types_update():
         try:
 
             updated_sql = "update member_types set member_title='{member_title}',member_price={member_price}, " \
-                          "member_limit={member_limit},member_describe='{member_describe}',number={number}," \
+                          "member_limit='{member_limit}',member_describe='{member_describe}',number={number}," \
                           "member_details='{member_details}',updated_at={updated_at} " \
                           "where id={id}"\
                 .format(id=member_id, member_title=member_title, member_price=member_price, member_limit=member_limit,
