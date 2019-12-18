@@ -211,7 +211,7 @@ def member_types_update():
 def submit_member_types():
     """
     提交会员类型
-    :return:
+    :return:get-member-wxcode-update
     """
     if request.method == 'POST':
         member_title = request.form['title']
