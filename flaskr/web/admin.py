@@ -162,6 +162,7 @@ def admin_member_type_add():
         member_describe = res['member_describe']
         member_details = res['member_details']
         number = res['number']
+        db_session.close()
 
     return render_template('member-type-add.html',
                            op_type=op_type, member_id=member_id, member_title=member_title, member_price=member_price,
