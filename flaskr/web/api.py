@@ -581,6 +581,12 @@ def weixin_pay():
         db_session.close()
         return jsonify({'return_code': 'FAIL'})
 
+    
+@api_bp.after_request
+def release_db(response):
+    db_session.close()
+    return response
+
 # @api_bp.route('/weixin-request-payment', methods=["POST"])
 # def weixin_request_payment():
 #     if request.method == 'POST':

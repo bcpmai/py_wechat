@@ -556,6 +556,11 @@ def admin_upload():
         return jsonify({"code": 1, "msg": "false"})
 
 
+@admin_bp.after_request
+def release_db(response):
+    db_session.close()
+    return response
+
 # def check_login():
 #     """
 #     检查登录
