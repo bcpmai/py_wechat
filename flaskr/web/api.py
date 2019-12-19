@@ -516,7 +516,8 @@ def weixin_pay():
         data['total_fee'] = int(json_data_dict['total_fee'] * 100)
         # data['total_fee'] = 7500
         # 终端IP，由前端获取
-        data['spbill_create_ip'] = json_data_dict['ip']
+        data['spbill_create_ip'] = "39.105.26.81"
+        #"//json_data_dict['ip']
         # 线上通知回调地址
         data['notify_url'] = 'http://yije.xiusha.net/notice-weixin-payment'
         # 交易类型
