@@ -518,7 +518,7 @@ def weixin_pay():
         # 终端IP，由前端获取
         data['spbill_create_ip'] = json_data_dict['ip']
         # 线上通知回调地址
-        data['notify_url'] = 'http://yije.xiusha.net/notice-weixin-payment'
+        data['notify_url'] = 'https://yije.xiusha.net/notice-weixin-payment'
         # 交易类型
         data['trade_type'] = 'JSAPI'
         # data['trade_type'] = 'NATIVE'
