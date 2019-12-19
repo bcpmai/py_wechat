@@ -88,44 +88,41 @@
             var $ = layui.jquery;
             var layedit = layui.layedit;
 
+            layedit.set({
+                uploadImage: {
+                    url: '/admin/upload',
+                    accept: 'image',
+                    acceptMime: 'image/*',
+                    exts: 'jpg|png|gif|bmp|jpeg',
+                    size: '10240'
+                }
+                //, uploadVideo: {
+                //    url: '/Attachment/LayUploadFile',
+                //    accept: 'video',
+                //    acceptMime: 'video/*',
+                //    exts: 'mp4|flv|avi|rm|rmvb',
+                //    size: '20480'
+                //}
+                //右键删除图片/视频时的回调参数，post到后台删除服务器文件等操作，
+                //传递参数：
+                //图片： imgpath --图片路径
+                //视频： filepath --视频路径
+                //开发者模式 --默认为false
+                , devmode: true
+                //插入代码设置
+                , codeConfig: {
+                    hide: true,  //是否显示编码语言选择框
+                    default: 'javascript' //hide为true时的默认语言格式
+                }
+                , tool: [
+                    'html','image','code', 'strong', 'italic', 'underline', 'del', 'addhr', '|', 'fontFomatt', 'colorpicker', 'face'
+                    , '|', 'left', 'center', 'right', '|', 'link', 'unlink', 'image_alt', 'video', 'anchors'
+                    , '|', 'fullScreen'
+                ]
+                , height: '90%'
+            });
 
-            {#layedit.set({#}
-            {#    uploadImage: {#}
-            {#        url: '/Attachment/LayUploadFile',#}
-            {#        accept: 'image',#}
-            {#        acceptMime: 'image/*',#}
-            {#        exts: 'jpg|png|gif|bmp|jpeg',#}
-            {#        size: '10240'#}
-            {#    }#}
-            {#    , uploadVideo: {#}
-            {#        url: '/Attachment/LayUploadFile',#}
-            {#        accept: 'video',#}
-            {#        acceptMime: 'video/*',#}
-            {#        exts: 'mp4|flv|avi|rm|rmvb',#}
-            {#        size: '20480'#}
-            {#    }#}
-            {#    //右键删除图片/视频时的回调参数，post到后台删除服务器文件等操作，#}
-            {#    //传递参数：#}
-            {#    //图片： imgpath --图片路径#}
-            {#    //视频： filepath --视频路径#}
-            {#    //开发者模式 --默认为false#}
-            {#    , devmode: true#}
-            {#    //插入代码设置#}
-            {#    , codeConfig: {#}
-            {#        hide: true,  //是否显示编码语言选择框#}
-            {#        default: 'javascript' //hide为true时的默认语言格式#}
-            {#    }#}
-            {#    , tool: [#}
-            {#        'html', 'code', 'strong', 'italic', 'underline', 'del', 'addhr', '|', 'fontFomatt', 'colorpicker', 'face'#}
-            {#        , '|', 'left', 'center', 'right', '|', 'link', 'unlink', 'image_alt', 'video', 'anchors'#}
-            {#        , '|', 'fullScreen'#}
-            {#    ]#}
-            {#    , height: '90%'#}
-            {#});#}
-
-
-            var layui_content = layedit.build('details');
-
+            var layui_content = layedit.build('details',{height: 380});
             var form = layui.form,
             layer = layui.layer;
 

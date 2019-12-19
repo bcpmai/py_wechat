@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
+import os
 import time
 import traceback
 from flask import Flask, session, redirect, url_for
 from flask import Blueprint, jsonify, Flask, request, render_template
 
-from flaskr.common import db_session, password
+from flaskr.common import db_session, password, app
 from flaskr.common.utils import timestamp_to_date
 from flaskr.db_model.member import Member
 from flaskr.db_model.repair_order import RepairOrder
@@ -97,7 +98,7 @@ def admin_order_status_edit():
 
         try:
 
-            update_sql = "update repair_order set status = 1,updated_at={updated_at} where id={order_id}".\
+            update_sql = "update repair_order set status = 1,updated_at={updated_at} where id={order_id}". \
                 format(order_id=order_id, updated_at=updated_at)
 
             db_session.execute(update_sql)
@@ -164,7 +165,8 @@ def admin_member_type_add():
 
     return render_template('member-type-add.html',
                            op_type=op_type, member_id=member_id, member_title=member_title, member_price=member_price,
-                           member_limit=member_limit, member_describe=member_describe,member_details=member_details,number=number
+                           member_limit=member_limit, member_describe=member_describe, member_details=member_details,
+                           number=number
                            )
 
 
@@ -190,9 +192,10 @@ def member_types_update():
             updated_sql = "update member_types set member_title='{member_title}',member_price={member_price}, " \
                           "member_limit='{member_limit}',member_describe='{member_describe}',number={number}," \
                           "member_details='{member_details}',updated_at={updated_at} " \
-                          "where id={id}"\
+                          "where id={id}" \
                 .format(id=member_id, member_title=member_title, member_price=member_price, member_limit=member_limit,
-                        member_describe=member_describe, member_details=member_details, updated_at=updated_at,number=number)
+                        member_describe=member_describe, member_details=member_details, updated_at=updated_at,
+                        number=number)
 
             db_session.execute(updated_sql)
             db_session.commit()
@@ -230,7 +233,8 @@ def submit_member_types():
                                  "values ('{member_title}','{member_price}','{member_limit}','{member_describe}',{number}," \
                                  "'{member_details}',{created_at},{updated_at})". \
                 format(member_title=member_title, member_price=member_price, member_limit=member_limit,
-                       member_describe=member_describe, member_details=member_details, created_at=created_at,number=number,
+                       member_describe=member_describe, member_details=member_details, created_at=created_at,
+                       number=number,
                        updated_at=updated_at)
 
             db_session.execute(insert_address_sql)
@@ -343,7 +347,7 @@ def service_types_edit():
     service_types_id = request.args.get("id")
 
     query_sql = "SELECT t1.id,t1.type_id,t1.category_name,t2.type_name,t1.price,t1.created_at,t1.updated_at " \
-                "FROM types_category t1 LEFT JOIN types t2 ON t2.id=t1.type_id where t1.id ={service_types_id} ".\
+                "FROM types_category t1 LEFT JOIN types t2 ON t2.id=t1.type_id where t1.id ={service_types_id} ". \
         format(service_types_id=service_types_id)
     record = db_session.execute(query_sql).first()
 
@@ -362,7 +366,7 @@ def service_types_edit():
         try:
 
             update_sql = "update types_category set price={price},category_name='{category_name}',type_id={type_id} " \
-                         "where id={id}".\
+                         "where id={id}". \
                 format(type_id=type_id, price=price, category_name=category_name, id=service_types_id)
             db_session.execute(update_sql)
             db_session.commit()
@@ -522,8 +526,33 @@ def admin_logout():
     :return:
     """
     session.pop('username')
-
     return redirect('/admin/login')
+
+
+@admin_bp.route('/admin/upload', methods=["POST"])
+@login_required
+def admin_upload():
+    """
+    上传图片并保存文件
+    :return:
+    """
+    images = request.files.get('file')
+
+    # 得到upload的路径
+    upload_dir = os.path.join(os.path.dirname(app.instance_path), 'flaskr/static/upload/')
+
+    # 得到上传图片的url
+    image_path = os.path.join(upload_dir, images.filename)
+    image_url = os.path.join(os.getenv('domain_name', ''), 'static/upload/', images.filename)
+    print(image_url)
+    print(image_path)
+
+    try:
+        # 保存图片
+        images.save(image_path)
+        return jsonify({"code": 0, "msg": "success", "data": {"src": image_url, "title": images.filename}})
+    except Exception:
+        return jsonify({"code": 1, "msg": "false"})
 
 
 # def check_login():
