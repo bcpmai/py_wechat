@@ -77,15 +77,24 @@
                                 <td>{{ data.address|title }}</td>
                                 <td>{{ data.created_at|title }}</td>
                                 {% if data.status == 0  %}
-                                    <td>进行中</td>
-                                {% else %}
+                                    <td>已提交</td>
+                                {% endif %}
+                                {% if data.status == 2 %}
+                                    <td>已分配</td>
+                                {% endif %}
+                                {% if data.status != 0 and  data.status != 2 %}
                                     <td>已结束</td>
                                 {% endif %}
                                 <td class="td-manage">
-                                    {% if data.status == 0 %}
-                                    <a title="状态编辑" onclick="order_status(this,{{ data.id }})" href="javascript:;">
-                                        <i class="layui-icon">&#xe642;</i>
-                                    </a>
+                                    {% if data.status == 0%}
+                                        <a title="状态编辑" onclick="order_status(this,{{ data.id }},2)" href="javascript:;" style="color:#009688;text-decoration: underline">
+                                            修改为已分配
+                                        </a>
+                                    {% endif %}
+                                    {% if data.status == 2 or data.status == 0%}
+                                        <a title="状态编辑" onclick="order_status(this,{{ data.id }},1)" href="javascript:;" style="color:#009688;margin-left:10px;text-decoration: underline">
+                                            修改为已结束
+                                        </a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -116,14 +125,14 @@
 </body>
 <script>
 
-      function order_status(obj,id){
+      function order_status(obj,id,status){
           layer.confirm('确认要修改状态吗？',function(index){
 
               $.ajax({
                     type: "post",
                     url: "/admin/order/edit/status",
                     data: {
-                        status: 1,
+                        status: status || 1,
                         order_id: id
                     },
                     dataType: "json",

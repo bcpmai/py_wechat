@@ -95,11 +95,12 @@ def admin_order_status_edit():
     if request.method == 'POST':
         updated_at = int(time.time())
         order_id = request.form['order_id']
+        status = request.form['status']
 
         try:
 
-            update_sql = "update repair_order set status = 1,updated_at={updated_at} where id={order_id}". \
-                format(order_id=order_id, updated_at=updated_at)
+            update_sql = "update repair_order set status = {status},updated_at={updated_at} where id={order_id}". \
+                format(status=status, order_id=order_id, updated_at=updated_at)
 
             db_session.execute(update_sql)
             db_session.commit()
