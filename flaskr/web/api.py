@@ -324,6 +324,22 @@ def get_member_wxcode():
     db_session.close()
     return jsonify({'success': True, 'list': records})
 
+@api_bp.route('/get-member-grade', methods=["GET"])
+def get_member_grade():
+    """
+    :return:
+    """
+    records = list()
+
+    insert_address_sql = "SELECT * FROM member where member_grade='体验宝'"
+
+    res = db_session.execute(insert_address_sql).fetchall()
+    for temp in res:
+        records.append(dict(temp))
+
+    db_session.close()
+    return jsonify({'success': True, 'list': records})
+
 
 @api_bp.route('/get-member-wxcode-update', methods=["GET"])
 def get_member_wxcode_update():
@@ -581,7 +597,7 @@ def weixin_pay():
         db_session.close()
         return jsonify({'return_code': 'FAIL'})
 
-    
+
 @api_bp.after_request
 def release_db(response):
     db_session.close()

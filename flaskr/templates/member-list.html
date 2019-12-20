@@ -49,6 +49,7 @@
 {#                            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>#}
 {#                            <button class="layui-btn" onclick="xadmin.open('添加用户','./member-add.html',600,400)"><i class="layui-icon"></i>添加</button>#}
 {#                        </div>#}
+                        <div style="padding: 20px 20px 0 20px;font-size: 14px">体验宝目前已售：<span id="Gnumber" style="color: red;margin-right: 5px">0</span>份</div>
                         <div class="layui-card-body layui-table-body layui-table-main">
                             <table class="layui-table layui-form">
                                 <thead>
@@ -104,7 +105,21 @@
         </div> 
     </body>
     <script>
+
       layui.use(['laydate','form'], function(){
+          var jquery = layui.$ //重点处
+          jquery.ajax({
+            url: "/get-member-grade",
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                console.log(data,"ddddd")
+                if (data.success) {
+                    jquery("#Gnumber").html(data.list ? data.list.length : "0");
+                }
+            }
+        });
+
         var laydate = layui.laydate;
         var  form = layui.form;
 
