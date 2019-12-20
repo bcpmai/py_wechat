@@ -88,12 +88,12 @@
                                 <td class="td-manage">
                                     {% if data.status == 0%}
                                         <a title="状态编辑" onclick="order_status(this,{{ data.id }},2)" href="javascript:;" style="color:#009688;text-decoration: underline">
-                                            修改为已分配
+                                            已分配
                                         </a>
                                     {% endif %}
                                     {% if data.status == 2 or data.status == 0%}
                                         <a title="状态编辑" onclick="order_status(this,{{ data.id }},1)" href="javascript:;" style="color:#009688;margin-left:10px;text-decoration: underline">
-                                            修改为已结束
+                                            已结束
                                         </a>
                                     {% endif %}
                                 </td>
