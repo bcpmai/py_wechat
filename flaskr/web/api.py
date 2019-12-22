@@ -263,9 +263,9 @@ def get_repair_order():
 
     try:
 
-        insert_address_sql = "SELECT * FROM repair_order where status={status} and wx_code='{wx_code}'".format(
+        query_sql = "SELECT * FROM repair_order where status in ({status}) and wx_code='{wx_code}' order by id desc".format(
             status=status, wx_code=wx_code)
-        res = db_session.execute(insert_address_sql).fetchall()
+        res = db_session.execute(query_sql).fetchall()
         for temp in res:
             temp = dict(temp)
             temp['price'] = str(temp['price'])
