@@ -359,15 +359,13 @@ def get_member_wxcode_update():
 
     update_sql = ""
     if int(res['warranty_time']) > 1:
-        update_sql = "update member set warranty_time = {warranty_time} " \
-                     "where id = ( select id from ( select max(id) id from member where wx_code = '{wx_code}' ) t1)".\
-            format(wx_code=wx_code, warranty_time=(int(res['warranty_time']) - 1))
-        # update_sql = "update member set warranty_time = {warranty_time} " \
-        #              "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
+        update_sql = "update member set warranty_time = {warranty_time} where id = {id}".\
+            format(id=res['id'], warranty_time=(int(res['warranty_time']) - 1))
+
     if int(res['warranty_time']) == 1:
         update_sql = "update member set is_member = '否',warranty_time = {warranty_time} " \
-                     "where id = ( select id from ( select max(id) id from member where wx_code = '{wx_code}' ) t1)".\
-            format(wx_code=wx_code, warranty_time=(int(res['warranty_time']) - 1))
+                     "where id = {id}".\
+            format(id=res['id'], warranty_time=(int(res['warranty_time']) - 1))
         # update_sql = "update member set is_member = '否' ,warranty_time = {warranty_time} " \
         #              "where wx_code='{wx_code}'".format(wx_code=wx_code,warranty_time=(int(res['warranty_time']) -1))
 
